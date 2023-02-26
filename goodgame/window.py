@@ -1,0 +1,293 @@
+import ctypes
+from .events import DropEvent, TouchFingerEvent, KeyboardEvent, MouseMotionEvent, MouseButtonEvent, MouseWheelEvent,\
+    TextEditingEvent, TextInputEvent, WindowEvent
+from .video import DisplayMode, PixelFormat
+from .surface import Surface
+from sdl2 import *
+
+
+class Window:
+    def __init__(
+            self, app: any, pos: any = None, size: any = (640, 480)
+    ) -> None:
+        self.app = app
+        self.x, self.y = pos or (SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED)
+        self.w, self.h = size
+        self.destroyed = False
+        self.window = SDL_CreateWindow(
+            app.stb('Good Window'),
+            self.x, self.y,
+            self.w, self.h,
+            SDL_WINDOW_ALLOW_HIGHDPI | SDL_WINDOW_HIDDEN
+        )
+        if not self.window:
+            app.raise_error()
+        self.shown = False
+        self.borderless = False
+        self.maximized = False
+        self.minimized = False
+        self.resizable = False
+        self.always_on_top = False
+        self.input_focused = False
+        self.mouse_focused = False
+        self.emulate_mouse_with_touch = False
+        self.opacity = 1.0
+        self.brightness = 1.0
+        self.display_id = SDL_GetWindowDisplayIndex(self.window)
+        self.min_size = (0, 0)
+        self.max_size = (0, 0)
+        self.event_map = {
+            SDL_WINDOWEVENT_SHOWN: self.on_show,
+            SDL_WINDOWEVENT_HIDDEN: self.on_hide,
+            SDL_WINDOWEVENT_EXPOSED: self.on_expose,
+            SDL_WINDOWEVENT_MOVED: self.on_move,
+            SDL_WINDOWEVENT_RESIZED: self.on_resize,
+            SDL_WINDOWEVENT_SIZE_CHANGED: self.on_size_change,
+            SDL_WINDOWEVENT_MINIMIZED: self.on_minimize,
+            SDL_WINDOWEVENT_MAXIMIZED: self.on_maximize,
+            SDL_WINDOWEVENT_RESTORED: self.on_restore,
+            SDL_WINDOWEVENT_ENTER: self.on_enter,
+            SDL_WINDOWEVENT_LEAVE: self.on_leave,
+            SDL_WINDOWEVENT_FOCUS_GAINED: self.on_focus_gain,
+            SDL_WINDOWEVENT_FOCUS_LOST: self.on_focus_lose,
+            SDL_WINDOWEVENT_CLOSE: self.on_close,
+            SDL_WINDOWEVENT_TAKE_FOCUS: self.on_take_focus,
+            SDL_WINDOWEVENT_ICCPROF_CHANGED: self.on_icc_profile_change,
+            SDL_WINDOWEVENT_DISPLAY_CHANGED: self.on_display_change
+        }
+        borders = [ctypes.c_int(0), ctypes.c_int(0), ctypes.c_int(0), ctypes.c_int(0)]
+        SDL_GetWindowBordersSize(self.window, *borders)
+        self.borders_size = (borders[0].value, borders[1].value, borders[2].value, borders[3].value)
+        self.pixel_format = PixelFormat(SDL_GetWindowPixelFormat(self.window), app)
+        self.update_pos()
+        self.update_size()
+        self.display_mode = self.get_display_mode()
+        self.id = SDL_GetWindowID(self.window)
+        app.windows[self.id] = self
+
+    def set_title(self, title: str) -> None:
+        SDL_SetWindowTitle(self.window, self.app.stb(title))
+
+    def set_grab(self, grabbed: bool) -> None:
+        SDL_SetWindowGrab(self.window, grabbed)
+
+    def get_grab(self) -> bool:
+        return SDL_GetWindowGrab(self.window) == SDL_TRUE
+
+    def get_display_mode(self) -> DisplayMode:
+        display_mode = SDL_DisplayMode()
+        SDL_GetWindowDisplayMode(self.window, display_mode)
+        return DisplayMode(display_mode, self.app)
+
+    def set_display_mode(self, display_mode: DisplayMode) -> None:
+        SDL_SetWindowDisplayMode(self.window, display_mode.as_dm())
+        self.display_mode = self.get_display_mode()
+
+    def show(self) -> None:
+        SDL_ShowWindow(self.window)
+        self.update_flags()
+
+    def hide(self) -> None:
+        SDL_HideWindow(self.window)
+        self.update_flags()
+
+    def restore(self) -> None:
+        SDL_RestoreWindow(self.window)
+        self.update_flags()
+
+    def maximize(self) -> None:
+        SDL_MaximizeWindow(self.window)
+        self.update_flags()
+
+    def minimize(self) -> None:
+        SDL_MinimizeWindow(self.window)
+        self.update_flags()
+
+    def get_hwnd(self) -> int:
+        wm_info = SDL_SysWMinfo()
+        SDL_VERSION(wm_info.version)
+        SDL_GetWindowWMInfo(self.window, wm_info)
+        return wm_info.info.win.window
+
+    def update_flags(self) -> None:
+        flags = SDL_GetWindowFlags(self.window)
+        self.maximized = bool(flags & SDL_WINDOW_MAXIMIZED)
+        self.minimized = bool(flags & SDL_WINDOW_MINIMIZED)
+        self.shown = bool(flags & SDL_WINDOW_SHOWN)
+        self.input_focused = bool(flags & SDL_WINDOW_INPUT_FOCUS)
+        self.mouse_focused = bool(flags & SDL_WINDOW_MOUSE_FOCUS)
+        self.brightness = SDL_GetWindowBrightness(self.window)
+
+    def update_pos(self) -> None:
+        x_ptr, y_ptr = ctypes.c_int(), ctypes.c_int()
+        SDL_GetWindowPosition(self.window, x_ptr, y_ptr)
+        self.x, self.y = x_ptr.value, y_ptr.value
+
+    def update_size(self) -> None:
+        w_ptr, h_ptr = ctypes.c_int(), ctypes.c_int()
+        SDL_GetWindowSize(self.window, w_ptr, h_ptr)
+        self.w, self.h = w_ptr.value, h_ptr.value
+
+    def set_pos(self, pos: any) -> None:
+        if not pos:
+            pos = (SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED)
+        SDL_SetWindowPosition(self.window, pos[0], pos[1])
+        self.update_pos()
+
+    def set_size(self, size: any) -> None:
+        SDL_SetWindowSize(self.window, size[0], size[1])
+        self.update_size()
+
+    def set_min_size(self, w: int, h: int) -> None:
+        self.min_size = (w, h)
+        SDL_SetWindowMinimumSize(self.window, w, h)
+        self.update_size()
+
+    def set_max_size(self, w: int, h: int) -> None:
+        self.max_size = (w, h)
+        SDL_SetWindowMaximumSize(self.window, w, h)
+        self.update_size()
+
+    def set_window_mode(self, mode: str = 'windowed') -> None:
+        full_screen = 0
+        if mode == 'full_screen':
+            full_screen |= SDL_WINDOW_FULLSCREEN
+        elif mode == 'desktop':
+            full_screen |= SDL_WINDOW_FULLSCREEN_DESKTOP
+        elif not mode == 'windowed':
+            raise RuntimeError('Only full_screen, desktop and windowed modes are allowed!')
+        SDL_SetWindowFullscreen(self.window, full_screen)
+
+    def set_borderless(self, borderless: bool) -> None:
+        self.borderless = borderless
+        SDL_SetWindowBordered(self.window, not borderless)
+
+    def set_resizable(self, resizable: bool) -> None:
+        self.resizable = resizable
+        SDL_SetWindowResizable(self.window, resizable)
+
+    def set_always_on_top(self, always_on_top: bool) -> None:
+        self.always_on_top = always_on_top
+        SDL_SetWindowAlwaysOnTop(self.window, always_on_top)
+
+    def set_opacity(self, opacity: float) -> None:
+        self.opacity = opacity
+        SDL_SetWindowOpacity(self.window, opacity)
+
+    def set_brightness(self, brightness: float) -> None:
+        SDL_SetWindowBrightness(self.window, brightness)
+        self.update_size()
+
+    def set_icon(self, surf: Surface) -> None:
+        SDL_SetWindowIcon(self.window, surf.surface)
+
+    def destroy(self) -> bool:
+        if self.destroyed:
+            return True
+        self.destroyed = True
+        SDL_DestroyWindow(self.window)
+        del self.app.windows[self.id]
+        del self.app
+        return False
+
+    def on_drop_file(self, event: DropEvent) -> None:
+        pass
+
+    def on_drop_text(self, event: DropEvent) -> None:
+        pass
+
+    def on_drop_begin(self, event: DropEvent) -> None:
+        pass
+
+    def on_drop_complete(self, event: DropEvent) -> None:
+        pass
+
+    def on_finger_motion(self, event: TouchFingerEvent) -> None:
+        pass
+
+    def on_finger_down(self, event: TouchFingerEvent) -> None:
+        pass
+
+    def on_finger_up(self, event: TouchFingerEvent) -> None:
+        pass
+
+    def on_key_down(self, event: KeyboardEvent) -> None:
+        pass
+
+    def on_key_up(self, event: KeyboardEvent) -> None:
+        pass
+
+    def on_text_edit(self, event: TextEditingEvent) -> None:
+        pass
+
+    def on_text_edit_ext(self, event: TextEditingEvent) -> None:
+        pass
+
+    def on_mouse_move(self, event: MouseMotionEvent) -> None:
+        pass
+
+    def on_mouse_down(self, event: MouseButtonEvent) -> None:
+        pass
+
+    def on_mouse_up(self, event: MouseButtonEvent) -> None:
+        pass
+
+    def on_mouse_wheel(self, event: MouseWheelEvent) -> None:
+        pass
+
+    def on_text_input(self, event: TextInputEvent) -> None:
+        pass
+
+    def on_show(self, event: WindowEvent) -> None:
+        pass
+
+    def on_hide(self, event: WindowEvent) -> None:
+        self.update_flags()
+
+    def on_expose(self, event: WindowEvent) -> None:
+        self.update_flags()
+
+    def on_move(self, event: WindowEvent) -> None:
+        self.x, self.y = event.data1, event.data2
+
+    def on_resize(self, event: WindowEvent) -> None:
+        self.w, self.h = event.data1, event.data2
+
+    def on_size_change(self, event: WindowEvent) -> None:
+        self.w, self.h = event.data1, event.data2
+
+    def on_minimize(self, event: WindowEvent) -> None:
+        self.update_flags()
+
+    def on_maximize(self, event: WindowEvent) -> None:
+        self.update_flags()
+
+    def on_restore(self, event: WindowEvent) -> None:
+        self.update_flags()
+
+    def on_enter(self, event: WindowEvent) -> None:
+        self.update_flags()
+
+    def on_leave(self, event: WindowEvent) -> None:
+        self.update_flags()
+
+    def on_focus_gain(self, event: WindowEvent) -> None:
+        self.update_flags()
+
+    def on_focus_lose(self, event: WindowEvent) -> None:
+        self.update_flags()
+
+    def on_close(self, event: WindowEvent) -> None:
+        pass
+
+    def on_take_focus(self, event: WindowEvent) -> None:
+        self.update_flags()
+
+    def on_icc_profile_change(self, event: WindowEvent) -> None:
+        pass
+
+    def on_display_change(self, event: WindowEvent) -> None:
+        self.display_mode = self.get_display_mode()
+
+    def __del__(self) -> None:
+        self.destroy()

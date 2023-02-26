@@ -1,0 +1,351 @@
+import os
+from .exceptions import FlagNotFoundError, SDLError
+from .events import QuitEvent, AudioDeviceEvent, DropEvent, TouchFingerEvent, KeyboardEvent, MouseMotionEvent,\
+    MouseButtonEvent, MouseWheelEvent, TextEditingEvent, TextInputEvent, DisplayEvent, WindowEvent
+from .sdl import SDLVersion, sdl_dir
+from .surface import Surface
+from .video import PixelFormat
+from sdl2 import *
+try:
+    from sdl2.sdlimage import *
+except Exception as _err:
+    print(f'Failed to import SDL2_image [{_err}]. Image loading will be disabled!')
+try:
+    from sdl2.sdlmixer import *
+except Exception as _err:
+    print(f'Failed to import SDL2_mixer [{_err}]. Mixer will be disabled!')
+try:
+    from sdl2.sdlttf import *
+except Exception as _err:
+    print(f'Failed to import SDL2_ttf [{_err}]. Font loading and rendering will be disabled!')
+
+
+class App:
+    def __init__(self) -> None:
+        self.encoding = 'utf-8'
+        if SDL_BYTEORDER == SDL_LIL_ENDIAN:
+            self.endian = 'little'
+            self.default_rgb_mask = (0x0000FF, 0x00FF00, 0xFF0000, 0)
+            self.default_rgba_mask = (0x000000FF, 0x0000FF00, 0x00FF0000, 0xFF000000)
+        else:
+            self.endian = 'big'
+            self.default_rgb_mask = (0xFF0000, 0x00FF00, 0x0000FF, 0)
+            self.default_rgba_mask = (0xFF000000, 0x00FF0000, 0x0000FF00, 0x000000FF)
+        self.cwd = os.getcwd()
+        self.init_flags = {
+            'sdl': 0,
+            'image': 0,
+            'mixer': 0,
+            'has_sdl': False,
+            'has_image': False,
+            'has_mixer': False,
+            'has_ttf': False
+        }
+        self.blend_map = {
+            'none': SDL_BLENDMODE_NONE,
+            'blend': SDL_BLENDMODE_BLEND,
+            'add': SDL_BLENDMODE_ADD,
+            'mod': SDL_BLENDMODE_MOD,
+            'mul': SDL_BLENDMODE_MUL
+        }
+        self.r_blend_map = {b: a for a, b in self.blend_map.items()}
+        self.event_map = {
+            SDL_AUDIODEVICEADDED: lambda: self.on_audio_device_add(AudioDeviceEvent(self.sdl_event.audio)),
+            SDL_AUDIODEVICEREMOVED: lambda: self.on_audio_device_remove(AudioDeviceEvent(self.sdl_event.audio)),
+            SDL_QUIT: lambda: self.on_quit(QuitEvent(self.sdl_event.quit)),
+            SDL_DROPFILE: lambda: self.on_drop_file(DropEvent(self.sdl_event.drop, self)),
+            SDL_DROPTEXT: lambda: self.on_drop_text(DropEvent(self.sdl_event.drop, self)),
+            SDL_DROPBEGIN: lambda: self.on_drop_begin(DropEvent(self.sdl_event.drop, self)),
+            SDL_DROPCOMPLETE: lambda: self.on_drop_complete(DropEvent(self.sdl_event.drop, self)),
+            SDL_FINGERMOTION: lambda: self.on_finger_motion(TouchFingerEvent(self.sdl_event.finger, self)),
+            SDL_FINGERDOWN: lambda: self.on_finger_down(TouchFingerEvent(self.sdl_event.finger, self)),
+            SDL_FINGERUP: lambda: self.on_finger_up(TouchFingerEvent(self.sdl_event.finger, self)),
+            SDL_KEYDOWN: lambda: self.on_key_down(KeyboardEvent(self.sdl_event.key, self)),
+            SDL_KEYUP: lambda: self.on_key_up(KeyboardEvent(self.sdl_event.key, self)),
+            SDL_TEXTEDITING: lambda: self.on_text_edit(TextEditingEvent(self.sdl_event.edit, self)),
+            SDL_TEXTEDITING_EXT: lambda: self.on_text_edit_ext(TextEditingEvent(self.sdl_event.edit, self)),
+            SDL_MOUSEMOTION: lambda: self.on_mouse_move(MouseMotionEvent(self.sdl_event.motion, self)),
+            SDL_MOUSEBUTTONDOWN: lambda: self.on_mouse_down(MouseButtonEvent(self.sdl_event.button, self)),
+            SDL_MOUSEBUTTONUP: lambda: self.on_mouse_up(MouseButtonEvent(self.sdl_event.button, self)),
+            SDL_MOUSEWHEEL: lambda: self.on_mouse_wheel(MouseWheelEvent(self.sdl_event.wheel, self)),
+            SDL_TEXTINPUT: lambda: self.on_text_input(TextInputEvent(self.sdl_event.text, self)),
+            SDL_DISPLAYEVENT: lambda: self.on_display_event(DisplayEvent(self.sdl_event.display, self)),
+            SDL_WINDOWEVENT: lambda: self.on_window_event(WindowEvent(self.sdl_event.window, self))
+        }  # TODO: SDL_APP events
+        self.windows = {}
+        self.destroyed = False
+        self.running = False
+        self.sdl_event = SDL_Event()
+
+    @staticmethod
+    def alloc_pixel_format(pixel_format: PixelFormat) -> SDL_PixelFormat:
+        return SDL_AllocFormat(pixel_format.pixel_format)
+
+    def surface_from_bytes(
+            self, data: any, size: any, depth: int, pitch: int,
+            mask: any = (0, 0, 0, 0), pixel_format: PixelFormat = None
+    ) -> Surface:
+        if pixel_format:
+            surf = SDL_CreateRGBSurfaceWithFormatFrom(
+                data, int(size[0]), int(size[1]), depth, pitch, mask[0],
+                mask[1], mask[2], mask[3], pixel_format.pixel_format
+            )
+        else:
+            surf = SDL_CreateRGBSurfaceFrom(
+                data, int(size[0]), int(size[1]), depth, pitch, mask[0], mask[1], mask[2], mask[3]
+            )
+        if not surf:
+            self.raise_error()
+        return Surface(surf, self)
+
+    def create_rgb_surface(
+            self, size: any, depth: int = 32, mask: any = (0, 0, 0, 0), pixel_format: PixelFormat = None
+    ) -> Surface:
+        if pixel_format:
+            surf = SDL_CreateRGBSurfaceWithFormat(
+                0, int(size[0]), int(size[1]), depth, mask[0], mask[1], mask[2], mask[3], pixel_format.pixel_format
+            )
+        else:
+            surf = SDL_CreateRGBSurface(0, int(size[0]), int(size[1]), depth, mask[0], mask[1], mask[2], mask[3])
+        if not surf:
+            self.raise_error()
+        return Surface(surf, self)
+
+    def surface_from_bmp(self, path: str) -> Surface:
+        surf = SDL_LoadBMP(self.stb(path))
+        if not surf:
+            self.raise_error()
+        return Surface(surf, self)
+
+    def surface_from_file(self, path: str) -> Surface:
+        surf = IMG_Load(self.stb(path))
+        if not surf:
+            self.raise_error(IMG_GetError)
+        return Surface(surf, self)
+
+    def poll_events(self) -> None:
+        while SDL_PollEvent(self.sdl_event):
+            (self.event_map.get(self.sdl_event.type) or self.on_unknown_event)()
+
+    def on_unknown_event(self) -> None:
+        event_names = []
+        for var_name in sdl_dir:
+            if not var_name.startswith('SDL_'):
+                continue
+            if eval(var_name) == self.sdl_event.type:
+                event_names.append(var_name)
+        print(f'Unknown event {self.sdl_event.type}: {", ".join(event_names)}')
+
+    def run_loop(self) -> None:
+        self.running = True
+        while self.running:
+            self.on_tick()
+
+    def stop_loop(self) -> None:
+        self.running = False
+
+    def init(
+            self,
+            sdl_flags_list: any = ('video', 'events', 'timer'),
+            image_formats: any = ('png', 'jpg'),
+            mixer_formats: any = None,
+            init_ttf: bool = True
+    ) -> None:
+        if sdl_flags_list:
+            flag_map = {
+                'timer': SDL_INIT_TIMER,
+                'audio': SDL_INIT_AUDIO,
+                'video': SDL_INIT_VIDEO,
+                'joystick': SDL_INIT_JOYSTICK,
+                'haptic': SDL_INIT_HAPTIC,
+                'game_controller': SDL_INIT_GAMECONTROLLER,
+                'events': SDL_INIT_EVENTS,
+                'sensor': SDL_INIT_SENSOR
+            }
+            flags = 0
+            for flag_str in sdl_flags_list:
+                flag = flag_map.get(flag_str)
+                if not flag:
+                    raise FlagNotFoundError(f'Flag {flag_str} not found among: {", ".join(flag_map.keys())}')
+                flags |= flag
+            flags |= self.init_flags['sdl']
+            diff = self.init_flags['sdl'] ^ flags
+            if diff and SDL_Init(diff) < 0:
+                self.raise_error()
+            self.init_flags['sdl'] = flags
+            self.init_flags['has_sdl'] = True
+        if image_formats:
+            flag_map = {
+                'png': IMG_INIT_PNG,
+                'jpg': IMG_INIT_JPG,
+                'jxl': IMG_INIT_JXL,
+                'tif': IMG_INIT_TIF,
+                'avif': IMG_INIT_AVIF,
+                'webp': IMG_INIT_WEBP
+            }
+            flags = 0
+            for flag_str in image_formats:
+                flag = flag_map.get(flag_str)
+                if not flag:
+                    raise FlagNotFoundError(f'Format {flag_str} not found among: {", ".join(flag_map.keys())}')
+                flags |= flag
+            flags |= self.init_flags['image']
+            diff = self.init_flags['image'] ^ flags
+            if not IMG_Init(diff) == diff:
+                self.raise_error(IMG_GetError)
+            self.init_flags['image'] = flags
+            self.init_flags['has_image'] = True
+        if mixer_formats:
+            flag_map = {
+                'mp3': MIX_INIT_MP3,
+                'mid': MIX_INIT_MID,
+                'mod': MIX_INIT_MOD,
+                'ogg': MIX_INIT_OGG,
+                'flac': MIX_INIT_FLAC,
+                'opus': MIX_INIT_OPUS
+            }
+            flags = 0
+            for flag_str in mixer_formats:
+                flag = flag_map.get(flag_str)
+                if not flag:
+                    raise FlagNotFoundError(f'Format {flag_str} not found among: {", ".join(flag_map.keys())}')
+                flags |= flag
+            flags |= self.init_flags['mixer']
+            diff = self.init_flags['mixer'] ^ flags
+            if not Mix_Init(diff) == diff:
+                self.raise_error(Mix_GetError)
+            self.init_flags['mixer'] = flags
+            self.init_flags['has_mixer'] = True
+        if init_ttf and not self.init_flags['has_ttf']:
+            if TTF_Init() < 0:
+                self.raise_error(TTF_GetError)
+            self.init_flags['has_ttf'] = True
+
+    def destroy(self) -> bool:
+        if self.destroyed:
+            return True
+        self.destroyed = False
+        if self.init_flags['has_ttf']:
+            self.init_flags['has_ttf'] = False
+            TTF_Quit()
+        if self.init_flags['has_mixer']:
+            self.init_flags['has_mixer'] = False
+            self.init_flags['mixer'] = 0
+            Mix_Quit()
+        if self.init_flags['has_image']:
+            self.init_flags['has_image'] = False
+            self.init_flags['image'] = 0
+            IMG_Quit()
+        if self.init_flags['has_sdl']:
+            self.init_flags['has_sdl'] = False
+            self.init_flags['sdl'] = 0
+            SDL_Quit()
+        return False
+
+    def get_error(self, error_func: any = SDL_GetError) -> str:
+        return self.bts(error_func())
+
+    def raise_error(self, error_func: any = SDL_GetError) -> None:
+        raise SDLError(self.get_error(error_func))
+
+    def stb(self, str_to_convert: str, encoding: str = None) -> bytes:
+        return str_to_convert.encode(encoding or self.encoding, errors='replace')
+
+    def bts(self, bytes_to_convert: bytes, encoding: str = None) -> str:
+        return bytes_to_convert.decode(encoding or self.encoding, errors='replace')
+
+    def p(self, *path: str) -> str:
+        return os.path.join(self.cwd, *path)
+
+    @staticmethod
+    def get_sdl_version() -> SDLVersion:
+        ver = SDL_version()
+        SDL_GetVersion(ver)
+        return SDLVersion(ver)
+
+    @staticmethod
+    def print_sub_content(obj_for_displaying: any) -> None:
+        for elem_name in dir(obj_for_displaying):
+            if elem_name.startswith('_'):
+                continue
+            elem = getattr(obj_for_displaying, elem_name)
+            if not hasattr(elem, '__str__'):
+                continue
+            print(f'{elem_name}: {elem}')
+
+    def on_tick(self) -> None:
+        pass
+
+    def on_audio_device_add(self, event: AudioDeviceEvent) -> None:
+        pass
+
+    def on_audio_device_remove(self, event: AudioDeviceEvent) -> None:
+        pass
+
+    def on_quit(self, event: QuitEvent) -> None:
+        pass
+
+    def on_drop_file(self, event: DropEvent) -> None:  # noqa
+        event.window.on_drop_file(event)
+
+    def on_drop_text(self, event: DropEvent) -> None:  # noqa
+        event.window.on_drop_text(event)
+
+    def on_drop_begin(self, event: DropEvent) -> None:  # noqa
+        event.window.on_drop_begin(event)
+
+    def on_drop_complete(self, event: DropEvent) -> None:  # noqa
+        event.window.on_drop_complete(event)
+
+    def on_finger_motion(self, event: TouchFingerEvent) -> None:  # noqa
+        event.window.on_finger_motion(event)
+
+    def on_finger_down(self, event: TouchFingerEvent) -> None:  # noqa
+        event.window.on_finger_down(event)
+
+    def on_finger_up(self, event: TouchFingerEvent) -> None:  # noqa
+        event.window.on_finger_up(event)
+
+    def on_key_down(self, event: KeyboardEvent) -> None:  # noqa
+        event.window.on_key_down(event)
+
+    def on_key_up(self, event: KeyboardEvent) -> None:  # noqa
+        event.window.on_key_up(event)
+
+    def on_text_edit(self, event: TextEditingEvent) -> None:  # noqa
+        event.window.on_text_edit(event)
+
+    def on_text_edit_ext(self, event: TextEditingEvent) -> None:  # noqa
+        event.window.on_text_edit_ext(event)
+
+    def on_mouse_move(self, event: MouseMotionEvent) -> None:  # noqa
+        if event.emulated and not event.window.emulate_mouse_with_touch:
+            return
+        event.window.on_mouse_move(event)
+
+    def on_mouse_down(self, event: MouseButtonEvent) -> None:  # noqa
+        if event.emulated and not event.window.emulate_mouse_with_touch:
+            return
+        event.window.on_mouse_down(event)
+
+    def on_mouse_up(self, event: MouseButtonEvent) -> None:  # noqa
+        if event.emulated and not event.window.emulate_mouse_with_touch:
+            return
+        event.window.on_mouse_up(event)
+
+    def on_mouse_wheel(self, event: MouseWheelEvent) -> None:  # noqa
+        if event.emulated and not event.window.emulate_mouse_with_touch:
+            return
+        event.window.on_mouse_wheel(event)
+
+    def on_text_input(self, event: TextInputEvent) -> None:  # noqa
+        event.window.on_text_input(event)
+
+    def on_display_event(self, event: DisplayEvent) -> None:
+        pass
+
+    def on_window_event(self, event: WindowEvent) -> None:
+        event.window.event_map.get(self.sdl_event.window.event)(event)
+
+    def __del__(self) -> None:
+        self.destroy()
