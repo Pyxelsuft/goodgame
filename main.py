@@ -54,7 +54,7 @@ class App(gg.App):
         self.init()
         self.window = Window(self, (800, 600))
         self.clock = gg.Clock()
-        self.clock.run()
+        self.clock.reset()
         self.run_loop()
 
     def on_tick(self) -> None:

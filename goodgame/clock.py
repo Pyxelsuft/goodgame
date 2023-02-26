@@ -9,7 +9,7 @@ class Clock:
         self.last_tick = 0
         self.fps_limit = 0
 
-    def run(self) -> None:
+    def reset(self) -> None:
         self.last_tick = SDL_GetPerformanceCounter()
 
     def tick(self) -> bool:

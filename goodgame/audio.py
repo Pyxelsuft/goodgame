@@ -15,7 +15,7 @@ class AudioSpec:
         self.userdata: any = None
 
 
-class AudioManager:
+class AudioDeviceManager:
     def __init__(self, app: any) -> None:
         self.app = app
         self.playback_devices = []
