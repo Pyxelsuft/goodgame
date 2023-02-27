@@ -6,10 +6,44 @@ from PIL import Image  # noqa
 import goodgame as gg
 
 
+class App(gg.App):
+    def __init__(self) -> None:
+        super().__init__()
+        # self.cwd = os.path.dirname(__file__) or os.getcwd()
+        self.init()
+        self.window = Window(self, (800, 600))
+        self.clock = gg.Clock()
+        self.clock.reset()
+        self.run_loop()
+
+    def on_tick(self) -> None:
+        self.poll_events()
+        if self.running and self.clock.tick():
+            self.window.renderer.update()
+
+    def on_quit(self, event: gg.QuitEvent) -> None:
+        super().on_quit(event)
+        self.stop_loop()
+        self.window.destroy()
+        self.destroy()
+
+
+class Window(gg.Window):
+    def __init__(self, app: any, size: any) -> None:
+        super().__init__(app, size=size)
+        self.app: App = self.app
+        self.emulate_mouse_with_touch = True
+        wintheme.set_window_theme(self.get_hwnd(), wintheme.THEME_DARK)
+        self.renderer = Renderer(self)
+        self.show()
+
+
 class Renderer(gg.Renderer):
     def __init__(self, window: any) -> None:
         super().__init__(window, vsync=True)
-        window.set_title(f'Good Window [{self.backend.name}]')
+        self.app: App = self.app
+        self.window: Window = self.window
+        self.window.set_title(f'Good Window [{self.backend.name}]')
         # self.test_tex = self.texture_from_file('e:/other/98bug.png')
         img = Image.open('e:/other/98bug.png')
         pd = img.tobytes()
@@ -37,37 +71,6 @@ class Renderer(gg.Renderer):
         )
         self.counter += dt
         self.flip()
-
-
-class Window(gg.Window):
-    def __init__(self, app: any, size: any) -> None:
-        super().__init__(app, size=size)
-        self.emulate_mouse_with_touch = True
-        wintheme.set_window_theme(self.get_hwnd(), wintheme.THEME_DARK)
-        self.renderer = Renderer(self)
-        self.show()
-
-
-class App(gg.App):
-    def __init__(self) -> None:
-        super().__init__()
-        # self.cwd = os.path.dirname(__file__) or os.getcwd()
-        self.init()
-        self.window = Window(self, (800, 600))
-        self.clock = gg.Clock()
-        self.clock.reset()
-        self.run_loop()
-
-    def on_tick(self) -> None:
-        self.poll_events()
-        if self.running and self.clock.tick():
-            self.window.renderer.update()
-
-    def on_quit(self, event: gg.QuitEvent) -> None:
-        super().on_quit(event)
-        self.stop_loop()
-        self.window.destroy()
-        self.destroy()
 
 
 if __name__ == '__main__':
