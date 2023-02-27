@@ -79,6 +79,26 @@ class Window:
         #  gamma ramp, hit test (maybe no?) and other spec. things
 
     @staticmethod
+    def get_mouse_buttons() -> tuple:
+        state = SDL_GetMouseState(None, None)
+        return (
+            bool(state & SDL_BUTTON_LMASK),
+            bool(state & SDL_BUTTON_MMASK),
+            bool(state & SDL_BUTTON_RMASK),
+            bool(state & SDL_BUTTON_X1MASK),
+            bool(state & SDL_BUTTON_X2MASK)
+        )
+
+    @staticmethod
+    def get_mouse_pos() -> tuple:
+        x_ptr, y_ptr = ctypes.c_int(), ctypes.c_int()
+        SDL_GetMouseState(x_ptr, y_ptr)
+        return x_ptr.value, y_ptr.value
+
+    def set_mouse_pos(self, pos: any) -> None:
+        SDL_WarpMouseInWindow(self.window, int(pos[0]), int(pos[1]))
+
+    @staticmethod
     def screen_saver(enabled: bool) -> None:
         (SDL_EnableScreenSaver if enabled else SDL_DisableScreenSaver)()
 

@@ -35,7 +35,6 @@ class Window(gg.Window):
         self.emulate_mouse_with_touch = True
         wintheme.set_window_theme(self.get_hwnd(), wintheme.THEME_DARK)
         self.renderer = Renderer(self)
-        self.show()
 
 
 class Renderer(gg.Renderer):
@@ -57,6 +56,7 @@ class Renderer(gg.Renderer):
         surf.blit_scaled(surf, (0, 0, 50, 50), (100, 100, 200, 125))
         self.test_tex = self.texture_from_surface(surf)
         self.counter = 0
+        self.window.show()
         self.window.raise_self()
 
     def update(self) -> None:

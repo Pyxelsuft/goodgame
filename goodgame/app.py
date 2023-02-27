@@ -77,11 +77,90 @@ class App:
         self.windows = {}
         self.destroyed = False
         self.running = False
+        self.rel_mouse_mode = False
+        self.mouse_capture = False
         self.sdl_event = SDL_Event()
         self.get_preferred_locales()
         # TODO:
         #  SDL_APP events
         #  add keyboard buffer func (costs a lot of performance) and some other funcs
+        #  In window functions move to Window?
+        #  Custom message box
+        #  Cursor Functions
+
+    def set_mouse_capture(self, enabled: bool) -> None:
+        self.mouse_capture = enabled
+        SDL_CaptureMouse(enabled)
+
+    def set_rel_mouse(self, enabled: bool) -> None:
+        self.rel_mouse_mode = enabled
+        SDL_SetRelativeMouseMode(enabled)
+
+    @staticmethod
+    def set_mouse_pos(pos: any) -> None:
+        SDL_WarpMouseGlobal(int(pos[0]), int(pos[1]))
+
+    @staticmethod
+    def get_mouse_buttons() -> tuple:
+        state = SDL_GetGlobalMouseState(None, None)
+        return (
+            bool(state & SDL_BUTTON_LMASK),
+            bool(state & SDL_BUTTON_MMASK),
+            bool(state & SDL_BUTTON_RMASK),
+            bool(state & SDL_BUTTON_X1MASK),
+            bool(state & SDL_BUTTON_X2MASK)
+        )
+
+    @staticmethod
+    def get_mouse_pos() -> tuple:
+        x_ptr, y_ptr = ctypes.c_int(), ctypes.c_int()
+        SDL_GetGlobalMouseState(x_ptr, y_ptr)
+        return x_ptr.value, y_ptr.value
+
+    @staticmethod
+    def get_rel_mouse_buttons() -> tuple:
+        state = SDL_GetRelativeMouseState(None, None)
+        return (
+            bool(state & SDL_BUTTON_LMASK),
+            bool(state & SDL_BUTTON_MMASK),
+            bool(state & SDL_BUTTON_RMASK),
+            bool(state & SDL_BUTTON_X1MASK),
+            bool(state & SDL_BUTTON_X2MASK)
+        )
+
+    @staticmethod
+    def get_rel_mouse_pos() -> tuple:
+        x_ptr, y_ptr = ctypes.c_int(), ctypes.c_int()
+        SDL_GetRelativeMouseState(x_ptr, y_ptr)
+        return x_ptr.value, y_ptr.value
+
+    @staticmethod
+    def get_power_info() -> dict:
+        seconds_ptr, percent_ptr = ctypes.c_int(), ctypes.c_int()
+        power_state = SDL_GetPowerInfo(seconds_ptr, percent_ptr)
+        return {
+            'power_state': {
+                SDL_POWERSTATE_UNKNOWN: 'unknown',
+                SDL_POWERSTATE_ON_BATTERY: 'on_battery',
+                SDL_POWERSTATE_NO_BATTERY: 'no_battery',
+                SDL_POWERSTATE_CHARGING: 'charging',
+                SDL_POWERSTATE_CHARGED: 'charged'
+            }.get(power_state),
+            'seconds_left': None if seconds_ptr.value == -1 else seconds_ptr.value,
+            'percentage': None if percent_ptr.value == -1 else percent_ptr.value
+        }
+
+    def get_pref_path(self, app: str, org: str = None) -> str:
+        pref_path = SDL_GetPrefPath(org and self.stb(org), app and self.stb(app))
+        if not pref_path:
+            self.raise_error()
+        return self.bts(pref_path)
+
+    def get_base_path(self) -> str:
+        base_path = SDL_GetBasePath()
+        if not base_path:
+            self.raise_error()
+        return self.bts(base_path)
 
     @staticmethod
     def get_keyboard_state() -> tuple:
@@ -134,7 +213,6 @@ class App:
             icon_type: str = None,
             window: Window = None
     ) -> None:
-        # TODO: simple message box
         flags = 0
         if icon_type == 'information':
             flags |= SDL_MESSAGEBOX_INFORMATION
