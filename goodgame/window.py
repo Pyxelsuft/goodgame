@@ -8,7 +8,12 @@ from sdl2 import *
 
 class Window:
     def __init__(
-            self, app: any, pos: any = None, size: any = (640, 480)
+            self,
+            app: any,
+            pos: any = None,
+            size: any = (640, 480),
+            skip_taskbar: bool = False,
+            window_type: str = None
     ) -> None:
         self.app = app
         self.x, self.y = pos or (SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED)
@@ -18,10 +23,15 @@ class Window:
             app.stb('Good Window'),
             self.x, self.y,
             self.w, self.h,
-            SDL_WINDOW_ALLOW_HIGHDPI | SDL_WINDOW_HIDDEN
+            SDL_WINDOW_ALLOW_HIGHDPI | SDL_WINDOW_HIDDEN | (SDL_WINDOW_UTILITY if window_type == 'utility' else (
+                SDL_WINDOW_TOOLTIP if window_type == 'tooltip' else (
+                    SDL_WINDOW_POPUP_MENU if window_type == 'popup_menu' else 0
+                )
+            )) | (SDL_WINDOW_SKIP_TASKBAR if skip_taskbar else 0)
         )
         if not self.window:
             app.raise_error()
+        self.mouse_rect = None
         self.shown = False
         self.borderless = False
         self.maximized = False
@@ -63,7 +73,46 @@ class Window:
         self.update_size()
         self.display_mode = self.get_display_mode()
         self.id = SDL_GetWindowID(self.window)
+        self.get_icc_profile()
         app.windows[self.id] = self
+        # TODO:
+        #  gamma ramp, hit test (maybe no?) and other spec. things
+
+    @staticmethod
+    def screen_saver(enabled: bool) -> None:
+        (SDL_EnableScreenSaver if enabled else SDL_DisableScreenSaver)()
+
+    @staticmethod
+    def is_screen_saver_enabled() -> bool:
+        return bool(SDL_IsScreenSaverEnabled())
+
+    def flash(self) -> None:
+        SDL_FlashWindow(self.window)
+
+    def focus_input(self) -> None:
+        SDL_SetWindowInputFocus(self.window)
+
+    def make_modal(self, parent_window: any) -> None:
+        SDL_SetWindowModalFor(self.window, parent_window.window)
+
+    def set_mouse_rect(self, mouse_rect: any = None) -> None:
+        SDL_SetWindowMouseRect(
+            self.window,
+            mouse_rect and SDL_Rect(int(mouse_rect[0]), int(mouse_rect[1]), int(mouse_rect[2]), int(mouse_rect[3]))
+        )
+        self.mouse_rect = mouse_rect
+
+    def set_mouse_grab(self, enabled: bool) -> None:
+        SDL_SetWindowMouseGrab(self.window, enabled)
+
+    def set_keyboard_grab(self, enabled: bool) -> None:
+        SDL_SetWindowKeyboardGrab(self.window, enabled)
+
+    def get_icc_profile(self) -> bytes:
+        size_ptr = ctypes.c_size_t()
+        data_ptr = SDL_GetWindowICCProfile(self.window, size_ptr)
+        data_buf = (ctypes.c_uint8 * size_ptr.value).from_address(data_ptr)
+        return bytes(data_buf[x] for x in range(size_ptr.value))
 
     def set_title(self, title: str) -> None:
         SDL_SetWindowTitle(self.window, self.app.stb(title))
@@ -191,6 +240,9 @@ class Window:
 
     def set_icon(self, surf: Surface) -> None:
         SDL_SetWindowIcon(self.window, surf.surface)
+
+    def raise_self(self) -> None:
+        SDL_RaiseWindow(self.window)
 
     def destroy(self) -> bool:
         if self.destroyed:

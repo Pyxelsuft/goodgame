@@ -1,6 +1,6 @@
 from sdl2 import *
 from .video import Display
-
+# TODO: use tuples for pos
 
 class CommonEvent:
     def __init__(self, event: SDL_Event) -> None:

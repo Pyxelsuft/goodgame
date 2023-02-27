@@ -57,7 +57,7 @@ class Renderer(gg.Renderer):
         surf.blit_scaled(surf, (0, 0, 50, 50), (100, 100, 200, 125))
         self.test_tex = self.texture_from_surface(surf)
         self.counter = 0
-        self.app.enable_text_input(True)
+        self.window.raise_self()
 
     def update(self) -> None:
         dt = self.app.clock.delta

@@ -71,15 +71,39 @@ class Display:
 
 class DisplaysManager:
     def __init__(self, app: any) -> None:
+        self.app = app
         self.displays = [Display(i, app) for i in range(SDL_GetNumVideoDisplays())]
+        self.destroyed = False
 
-    def get_display_rect(self, x: int, y: int, w: int, h: int) -> Display:
-        screen_rect = SDL_Rect(x, y, w, h)
+    def get_display_rect(self, given_rect: any) -> Display:
+        screen_rect = SDL_Rect(int(given_rect[0]), int(given_rect[2]), int(given_rect[2]), int(given_rect[3]))
         return self.displays[SDL_GetRectDisplayIndex(screen_rect)]
 
-    def get_display_point(self, x: int, y: int) -> Display:
-        screen_point = SDL_Point(x, y)
+    def get_display_point(self, point: any) -> Display:
+        screen_point = SDL_Point(int(point[0]), int(point[1]))
         return self.displays[SDL_GetPointDisplayIndex(screen_point)]
+
+    def get_window_display(self, window: any) -> Display:
+        return self.displays[SDL_GetWindowDisplayIndex(window.window)]
+
+    def get_window_display_mode(self, window: any) -> DisplayMode:
+        dm_ptr = SDL_DisplayMode()
+        SDL_GetWindowDisplayMode(window.window, dm_ptr)
+        return DisplayMode(dm_ptr, self.app)
+
+    @staticmethod
+    def set_window_display_mode(window: any, display_mode: DisplayMode) -> None:
+        SDL_SetWindowDisplayMode(window.window, display_mode.as_dm())
+
+    def destroy(self) -> bool:
+        if self.destroyed:
+            return True
+        del self.app
+        self.destroyed = True
+        return False
+
+    def __del__(self) -> None:
+        self.destroy()
 
 
 class Backend:
@@ -129,3 +153,9 @@ class BackendManager:
                 if backend.name == order:
                     return backend.backend_id
         return -1
+
+
+class DriverManager:
+    def __init__(self, app: any) -> None:
+        self.drivers = [app.bts(SDL_GetVideoDriver(x)) for x in range(SDL_GetNumVideoDrivers())]
+        self.current_driver = app.bts(SDL_GetCurrentVideoDriver())
