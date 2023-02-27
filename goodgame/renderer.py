@@ -33,7 +33,20 @@ class Renderer:
         )
         self.render_target_supported = bool(SDL_RenderTargetSupported(self.renderer))
         self.destroyed = False
-        # TODO: check out of bounds (check if this handled automatic by sdl); SDL_RenderReadPixels
+        # TODO:
+        #  check out of bounds (check if this handled automatic by sdl); SDL_RenderReadPixels
+        #  SDL_RenderGeometry, SDL_RenderGeometryRaw
+        #  Fix Scaling for SDL2_gfx
+    
+    def window_to_logical(self, pos: any) -> tuple:
+        w_ptr, h_ptr = ctypes.c_float(), ctypes.c_float()
+        SDL_RenderWindowToLogical(self.renderer, int(pos[0]), int(pos[1]), w_ptr, h_ptr)
+        return w_ptr.value, h_ptr.value
+
+    def logical_to_window(self, pos: any) -> tuple:
+        w_ptr, h_ptr = ctypes.c_int(), ctypes.c_int()
+        SDL_RenderLogicalToWindow(self.renderer, pos[0], pos[1], w_ptr, h_ptr)
+        return w_ptr.value, h_ptr.value
 
     def gt_scale(self) -> tuple:
         scale_x_ptr, scale_y_ptr = ctypes.c_float(), ctypes.c_float()

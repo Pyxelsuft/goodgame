@@ -1,4 +1,5 @@
 import os
+import ctypes
 from .exceptions import FlagNotFoundError, SDLError
 from .events import QuitEvent, AudioDeviceEvent, DropEvent, TouchFingerEvent, KeyboardEvent, MouseMotionEvent,\
     MouseButtonEvent, MouseWheelEvent, TextEditingEvent, TextInputEvent, DisplayEvent, WindowEvent
@@ -72,12 +73,27 @@ class App:
             SDL_TEXTINPUT: lambda: self.on_text_input(TextInputEvent(self.sdl_event.text, self)),
             SDL_DISPLAYEVENT: lambda: self.on_display_event(DisplayEvent(self.sdl_event.display, self)),
             SDL_WINDOWEVENT: lambda: self.on_window_event(WindowEvent(self.sdl_event.window, self))
-        }  # TODO: SDL_APP events
+        }
         self.windows = {}
         self.destroyed = False
         self.running = False
         self.sdl_event = SDL_Event()
         self.get_preferred_locales()
+        # TODO:
+        #  SDL_APP events
+        #  add keyboard buffer func (costs a lot of performance) and some other funcs
+
+    @staticmethod
+    def get_keyboard_state() -> tuple:
+        return bool(SDL_IsTextInputActive()), bool(SDL_IsTextInputShown()), bool(SDL_HasScreenKeyboardSupport())
+
+    @staticmethod
+    def clear_text_input() -> None:
+        SDL_ClearComposition()
+
+    @staticmethod
+    def enable_text_input(enabled: bool) -> None:
+        (SDL_StartTextInput if enabled else SDL_StopTextInput)()
 
     @staticmethod
     def get_time() -> float:

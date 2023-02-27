@@ -186,6 +186,9 @@ class Window:
     ) -> None:
         return self.app.show_message_box(title, text, icon_type, self)
 
+    def is_screen_keyboard_shown(self) -> bool:
+        return bool(SDL_IsScreenKeyboardShown(self.window))
+
     def set_icon(self, surf: Surface) -> None:
         SDL_SetWindowIcon(self.window, surf.surface)
 
