@@ -178,6 +178,14 @@ class Window:
         SDL_SetWindowBrightness(self.window, brightness)
         self.update_size()
 
+    def show_message_box(
+            self,
+            title: str,
+            text: str,
+            icon_type: str = None
+    ) -> None:
+        return self.app.show_message_box(title, text, icon_type, self)
+
     def set_icon(self, surf: Surface) -> None:
         SDL_SetWindowIcon(self.window, surf.surface)
 

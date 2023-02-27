@@ -5,6 +5,7 @@ from .events import QuitEvent, AudioDeviceEvent, DropEvent, TouchFingerEvent, Ke
 from .sdl import SDLVersion, sdl_dir
 from .surface import Surface
 from .video import PixelFormat
+from .window import Window
 from sdl2 import *
 try:
     from sdl2.sdlimage import *
@@ -76,6 +77,93 @@ class App:
         self.destroyed = False
         self.running = False
         self.sdl_event = SDL_Event()
+        self.get_preferred_locales()
+
+    @staticmethod
+    def get_time() -> float:
+        return SDL_GetTicks64() / 1000
+
+    def sleep(self, time: float) -> None:
+        wait_for = self.get_time() + time
+        while self.get_time() < wait_for:
+            continue
+
+    def set_clipboard_text(self, text: str) -> None:
+        SDL_SetClipboardText(self.stb(text))
+
+    def set_primary_selection_text(self, text: str) -> None:
+        SDL_SetPrimarySelectionText(self.stb(text))
+
+    def get_clipboard_text(self) -> str:
+        if not SDL_HasClipboardText():
+            return ''
+        return self.bts(SDL_GetClipboardText())
+
+    def get_primary_selection_text(self) -> str:
+        if not SDL_HasPrimarySelectionText():
+            return ''
+        return self.bts(SDL_GetPrimarySelectionText())
+
+    def get_platform(self) -> str:
+        return self.bts(SDL_GetPlatform())
+
+    def open_url(self, url: str) -> None:
+        if SDL_OpenURL(self.stb(url)) < 0:
+            self.raise_error()
+
+    def show_message_box(
+            self,
+            title: str,
+            text: str,
+            icon_type: str = None,
+            window: Window = None
+    ) -> None:
+        # TODO: simple message box
+        flags = 0
+        if icon_type == 'information':
+            flags |= SDL_MESSAGEBOX_INFORMATION
+        elif icon_type == 'warning':
+            flags |= SDL_MESSAGEBOX_WARNING
+        elif icon_type == 'error':
+            flags |= SDL_MESSAGEBOX_ERROR
+        if SDL_ShowSimpleMessageBox(flags, self.stb(title), self.stb(text), window and window.window) < 0:
+            self.raise_error()
+
+    def get_preferred_locales(self) -> tuple:
+        return tuple({'lang': self.bts(x.language), 'country': self.bts(x.country)} for x in SDL_GetPreferredLocales())
+
+    def get_sdl_info(self) -> dict:
+        ver_ptr = SDL_version()
+        SDL_GetVersion(ver_ptr)
+        return {
+            'version': (ver_ptr.major, ver_ptr.minor, ver_ptr.patch),
+            'revision': self.bts(SDL_GetRevision())
+        }
+
+    @staticmethod
+    def get_cpu_info() -> dict:
+        return {
+            'count': SDL_GetCPUCount(),
+            'cache_line_size': SDL_GetCPUCacheLineSize(),
+            'ram': SDL_GetSystemRAM(),
+            'simd_alignment': SDL_SIMDGetAlignment(),
+            'RDTSC': bool(SDL_HasRDTSC()),
+            'AltiVec': bool(SDL_HasAltiVec()),
+            'MMX': bool(SDL_HasMMX()),
+            '3DNow': bool(SDL_Has3DNow()),
+            'SSE': bool(SDL_HasSSE()),
+            'SSE2': bool(SDL_HasSSE2()),
+            'SSE3': bool(SDL_HasSSE3()),
+            'SSE41': bool(SDL_HasSSE41()),
+            'SSE42': bool(SDL_HasSSE42()),
+            'AVX': bool(SDL_HasAVX()),
+            'AVX2': bool(SDL_HasAVX2()),
+            'AVX512F': bool(SDL_HasAVX512F()),
+            'ARMSIMD': bool(SDL_HasARMSIMD()),
+            'NEON': bool(SDL_HasNEON()),
+            'LSX': bool(SDL_HasLSX()),
+            'LASX': bool(SDL_HasLASX())
+        }
 
     @staticmethod
     def alloc_pixel_format(pixel_format: PixelFormat) -> SDL_PixelFormat:
