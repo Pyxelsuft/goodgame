@@ -1,6 +1,6 @@
 from sdl2 import *
 from .video import Display
-# TODO: use tuples for pos
+
 
 class CommonEvent:
     def __init__(self, event: SDL_Event) -> None:
@@ -52,10 +52,8 @@ class TouchFingerEvent(CommonEvent):
             self.event = 'down' if self.type == SDL_FINGERDOWN else 'up'
         self.touch_id = event.touchId
         self.finger_id = event.fingerId
-        self.x = event.x
-        self.y = event.y
-        self.dx = event.dx
-        self.dy = event.dy
+        self.pos = (event.x, event.y)
+        self.d_pos = (event.dx, event.dy)
         self.pressure = event.pressure
         self.window_id = event.windowID
         self.window = app.windows[self.window_id]
@@ -91,10 +89,8 @@ class MouseMotionEvent(CommonEvent):
             bool(event.state & SDL_BUTTON_X1MASK),
             bool(event.state & SDL_BUTTON_X2MASK)
         )
-        self.x = event.x
-        self.y = event.y
-        self.x_rel = event.xrel
-        self.y_rel = event.yrel
+        self.pos = (event.x, event.y)
+        self.rel = (event.xrel, event.yrel)
         self.window_id = event.windowID
         self.window = app.windows[self.window_id]
 
@@ -115,8 +111,7 @@ class MouseButtonEvent(CommonEvent):
         }.get(self.button_id)
         self.state = 'pressed' if event.state == SDL_PRESSED else 'released'
         self.clicks = event.clicks
-        self.x = event.x
-        self.y = event.y
+        self.pos = (event.x, event.y)
         self.window_id = event.windowID
         self.window = app.windows[self.window_id]
 
@@ -126,8 +121,7 @@ class MouseWheelEvent(CommonEvent):
         super().__init__(event)
         self.which = event.which
         self.emulated = self.which == SDL_TOUCH_MOUSEID
-        self.x = event.x
-        self.y = event.y
+        self.pos = (event.x, event.y)
         self.direction = 'flipped' if event.direction == SDL_MOUSEWHEEL_FLIPPED else 'normal'
         self.precise_x = event.preciseX
         self.precise_y = event.preciseY
