@@ -128,12 +128,6 @@ class Renderer:
     def texture_from_surface(self, surf: Surface) -> Texture:
         return Texture(SDL_CreateTextureFromSurface(self.renderer, surf.surface), self)
 
-    def begin_custom_scale(self) -> None:
-        SDL_RenderSetScale(self.renderer, 1, 1)
-
-    def end_custom_scale(self) -> None:
-        SDL_RenderSetScale(self.renderer, self.sx, self.sy)
-
     def draw_bezier(self, color: any, points: any, s: float) -> None:
         bezierRGBA(
             self.renderer,

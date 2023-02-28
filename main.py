@@ -64,6 +64,7 @@ class Renderer(gg.Renderer):
     def update(self) -> None:
         dt = self.app.clock.delta
         self.window.set_title(f'FPS: {self.app.clock.get_fps()}')
+        self.set_scale([math.sin(self.counter) / 2 + 0.75 for _ in range(2)])
         self.clear()
         self.blit_ex(
             self.test_tex,
@@ -71,6 +72,7 @@ class Renderer(gg.Renderer):
             angle=math.sin(self.counter) * 10,
             flip_horizontal=(self.counter * 4) % 2 >= 1
         )
+        self.draw_rect((255, 0, 0), (100, 100, 100, 100), 20)
         self.counter += dt
         self.flip()
 
