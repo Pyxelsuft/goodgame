@@ -26,7 +26,6 @@ class Renderer:
         self.backend = backend or BackendManager(self.app).get_best()
         self.vsync = vsync
         self.texture = None
-        self.sx, self.sy = 1.0, 1.0
         self.renderer = SDL_CreateRenderer(
             window.window,
             self.backend.backend_id,
@@ -55,7 +54,6 @@ class Renderer:
         return scale_x_ptr.value, scale_y_ptr.value
 
     def set_scale(self, scale: any = (1.0, 1.0)) -> None:
-        self.sx, self.sy = scale
         SDL_RenderSetScale(self.renderer, scale[0], scale[1])
 
     def is_clip_enabled(self) -> bool:
