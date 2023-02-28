@@ -72,7 +72,8 @@ class Renderer(gg.Renderer):
             angle=math.sin(self.counter) * 10,
             flip_horizontal=(self.counter * 4) % 2 >= 1
         )
-        self.draw_rect((255, 0, 0), (100, 100, 100, 100), 20)
+        self.draw_rect((255, 0, 0), (100.5, 100.5, 100, 100), 20)
+        self.draw_rect((255, 0, 0), (100, 100, 100, 100))
         self.counter += dt
         self.flip()
 

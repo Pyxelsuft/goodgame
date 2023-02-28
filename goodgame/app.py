@@ -83,13 +83,13 @@ class App:
         self.get_preferred_locales()
         # TODO:
         #  math
+        #  gifs (animations) loading
         #  controllers, joysticks, sensor, etc.
         #  pixels (palettes, etc)
         #  SDL_APP events
         #  add keyboard buffer func (costs a lot of performance) and some other funcs
         #  In window functions move to Window?
         #  Custom message box
-        #  Cursor Functions
 
     def set_mouse_capture(self, enabled: bool) -> None:
         self.mouse_capture = enabled
