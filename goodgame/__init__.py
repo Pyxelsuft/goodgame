@@ -9,3 +9,4 @@ from .window import Window
 from .surface import Surface
 from .texture import Texture
 from .renderer import Renderer
+from .cursor import CursorManager, Cursor
