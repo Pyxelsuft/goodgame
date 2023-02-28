@@ -125,6 +125,8 @@ class Backend:
 
 class BackendManager:
     def __init__(self, app: any) -> None:
+        self.drivers = [app.bts(SDL_GetVideoDriver(x)) for x in range(SDL_GetNumVideoDrivers())]
+        self.current_driver = app.bts(SDL_GetCurrentVideoDriver())
         self.prefer_order = ['opengl', 'opengles2', 'opengles', 'software']
         if sys.platform == 'win32':
             win_ver = sys.getwindowsversion().major
@@ -153,9 +155,3 @@ class BackendManager:
                 if backend.name == order:
                     return backend.backend_id
         return -1
-
-
-class DriverManager:
-    def __init__(self, app: any) -> None:
-        self.drivers = [app.bts(SDL_GetVideoDriver(x)) for x in range(SDL_GetNumVideoDrivers())]
-        self.current_driver = app.bts(SDL_GetCurrentVideoDriver())

@@ -4,7 +4,7 @@ from .clock import Clock
 from .events import CommonEvent, QuitEvent, AudioDeviceEvent, DropEvent, TouchFingerEvent, KeyboardEvent,\
     MouseMotionEvent, MouseButtonEvent, MouseWheelEvent, TextEditingEvent, TextInputEvent, DisplayEvent, WindowEvent
 from .audio import AudioDeviceManager
-from .video import BackendManager, Backend, DisplaysManager, Display, DisplayMode, PixelFormat, DriverManager
+from .video import BackendManager, Backend, DisplaysManager, Display, DisplayMode, PixelFormat
 from .window import Window
 from .surface import Surface
 from .texture import Texture

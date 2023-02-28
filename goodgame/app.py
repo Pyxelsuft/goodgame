@@ -52,8 +52,8 @@ class App:
         }
         self.r_blend_map = {b: a for a, b in self.blend_map.items()}
         self.event_map = {
-            SDL_AUDIODEVICEADDED: lambda: self.on_audio_device_add(AudioDeviceEvent(self.sdl_event.audio)),
-            SDL_AUDIODEVICEREMOVED: lambda: self.on_audio_device_remove(AudioDeviceEvent(self.sdl_event.audio)),
+            SDL_AUDIODEVICEADDED: lambda: self.on_audio_device_add(AudioDeviceEvent(self.sdl_event.adevice)),
+            SDL_AUDIODEVICEREMOVED: lambda: self.on_audio_device_remove(AudioDeviceEvent(self.sdl_event.adevice)),
             SDL_QUIT: lambda: self.on_quit(QuitEvent(self.sdl_event.quit)),
             SDL_DROPFILE: lambda: self.on_drop_file(DropEvent(self.sdl_event.drop, self)),
             SDL_DROPTEXT: lambda: self.on_drop_text(DropEvent(self.sdl_event.drop, self)),
@@ -82,6 +82,9 @@ class App:
         self.sdl_event = SDL_Event()
         self.get_preferred_locales()
         # TODO:
+        #  math
+        #  controllers, joysticks, sensor, etc.
+        #  pixels (palettes, etc)
         #  SDL_APP events
         #  add keyboard buffer func (costs a lot of performance) and some other funcs
         #  In window functions move to Window?

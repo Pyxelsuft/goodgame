@@ -18,6 +18,7 @@ class AudioSpec:
 class AudioDeviceManager:
     def __init__(self, app: any) -> None:
         self.app = app
+        self.current_driver = app.bts(SDL_GetCurrentAudioDriver())
         self.playback_devices = []
         self.recording_devices = []
         self.default_playback_info = AudioSpec()

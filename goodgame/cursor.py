@@ -1,3 +1,5 @@
+import ctypes
+
 from .surface import Surface
 from sdl2 import *
 
@@ -36,12 +38,31 @@ class CursorManager:
             'no': Cursor(SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_NO)),
             'hand': Cursor(SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_HAND))
         }
+        self.cursor_cache = None
         self.destroyed = False
-        # TODO: create cursor, check for errors on system cursors?
+        # TODO: fix create function
 
-    @staticmethod
-    def set(cursor: Cursor = None) -> None:
+    def set(self, cursor: Cursor = None) -> None:
+        self.cursor_cache = cursor
         SDL_SetCursor(cursor and cursor.cursor)
+
+    def create(self, data: any, hot_pos: any = (0, 0)) -> Cursor:
+        data_join = self.app.stb(''.join(data))
+        result = SDL_CreateCursor(
+            (ctypes.c_ubyte * (len(data) * len(data[0])))(
+                *data_join.replace(b'X', b'\x01').replace(b'I', b'\x01').replace(b'O', b'\x00').replace(b' ', b'\x00')
+            ),
+            (ctypes.c_ubyte * (len(data) * len(data[0])))(
+                *data_join.replace(b'X', b'\x01').replace(b'I', b'\x00').replace(b'O', b'\x01').replace(b' ', b'\x00')
+            ),
+            len(data[0]),
+            len(data),
+            int(hot_pos[0]),
+            int(hot_pos[1])
+        )
+        if not result:
+            self.app.raise_error()
+        return Cursor(result)
 
     def from_surface(self, surf: Surface, hot_pos: any = (0, 0)) -> Cursor:
         result = SDL_CreateColorCursor(surf.surface, int(hot_pos[0]), int(hot_pos[1]))
@@ -58,6 +79,7 @@ class CursorManager:
     def destroy(self) -> bool:
         if self.destroyed:
             return True
+        del self.cursor_cache
         del self.app
         self.destroyed = False
         return False
