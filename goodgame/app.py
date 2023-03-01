@@ -87,7 +87,7 @@ class App:
         #  gifs (animations) loading
         #  controllers, joysticks, sensor, etc.
         #  pixels (palettes, etc)
-        #  SDL_APP events
+        #  SDL_APP and other events
         #  add keyboard buffer func (costs a lot of performance) and some other funcs
         #  In window functions move to Window?
         #  Custom message box

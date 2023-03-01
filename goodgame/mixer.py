@@ -7,6 +7,7 @@ except:  # noqa
 
 # TODO:
 #  Finish
+#  Mix_ModMusicJumpToOrder
 
 
 class Music:
@@ -16,7 +17,95 @@ class Music:
         self.music = Mix_LoadMUS(self.app.stb(path))
         if not self.music:
             self.app.raise_error(Mix_GetError)
+        self.type = {
+            MUS_NONE: 'NONE',
+            MUS_CMD: 'CMD',
+            MUS_WAV: 'WAV',
+            MUS_MOD: 'MOD',
+            MUS_MID: 'MID',
+            MUS_OGG: 'OGG',
+            MUS_MP3: 'MP3',
+            MUS_MP3_MAD_UNUSED: 'MP3_MAD_UNUSED',
+            MUS_FLAC: 'FLAC',
+            MUS_MODPLUG_UNUSED: 'MODPLUG_UNUSED',
+            MUS_OPUS: 'OPUS'
+        }.get(Mix_GetMusicType(self.music))
+        self.title = self.app.bts(Mix_GetMusicTitle(self.music))
+        self.title_tag = self.app.bts(Mix_GetMusicTitleTag(self.music))
+        self.artist_tag = self.app.bts(Mix_GetMusicArtistTag(self.music))
+        self.album_tag = self.app.bts(Mix_GetMusicAlbumTag(self.music))
+        self.copyright_tag = self.app.bts(Mix_GetMusicCopyrightTag(self.music))
+        self.duration = Mix_MusicDuration(self.music)
+        self.loop_start = Mix_GetMusicLoopStartTime(self.music)
+        self.loop_end = Mix_GetMusicLoopEndTime(self.music)
+        self.loop_length = Mix_GetMusicLoopLengthTime(self.music)
         self.destroyed = False
+
+    def play(self, loops: int = 0, fade_in: float = 0.0, pos: float = 0.0) -> None:
+        if fade_in:
+            if pos:
+                Mix_FadeInMusicPos(self.music, loops, int(fade_in * 1000), pos)
+            else:
+                Mix_FadeInMusic(self.music, loops, int(fade_in * 1000))
+        else:
+            Mix_PlayMusic(self.music, loops)
+            if pos:
+                self.set_pos(pos)
+
+    @staticmethod
+    def set_pos(pos: float) -> None:
+        Mix_SetMusicPosition(pos)
+
+    def get_pos(self) -> float:
+        return Mix_GetMusicPosition(self.music)
+
+    @staticmethod
+    def mod_jump_to_order(order: int) -> None:
+        Mix_ModMusicJumpToOrder(order)
+
+    @staticmethod
+    def pause() -> None:
+        Mix_PauseMusic()
+
+    @staticmethod
+    def resume() -> None:
+        Mix_ResumeMusic()
+
+    @staticmethod
+    def rewind() -> None:
+        Mix_RewindMusic()
+
+    @staticmethod
+    def is_paused() -> bool:
+        return bool(Mix_PausedMusic())
+
+    @staticmethod
+    def is_playing() -> bool:
+        return bool(Mix_PlayingMusic())
+
+    @staticmethod
+    def fading_status() -> str:
+        status = Mix_FadingMusic()
+        if status == MIX_FADING_OUT:
+            return 'out'
+        if status == MIX_FADING_IN:
+            return 'in'
+        return 'no'
+
+    @staticmethod
+    def stop() -> None:
+        Mix_HaltMusic()
+
+    @staticmethod
+    def fade_out(fade_out: float) -> None:
+        Mix_FadeOutMusic(int(fade_out * 1000))
+
+    @staticmethod
+    def set_volume(volume: float = 1.0) -> None:
+        Mix_VolumeMusic(int(volume * MIX_MAX_VOLUME))
+
+    def get_volume(self) -> float:
+        return Mix_GetMusicVolume(self.music) / MIX_MAX_VOLUME
 
     def destroy(self) -> bool:
         if self.destroyed:
@@ -64,7 +153,7 @@ class Mixer:
             'default': MIX_DEFAULT_FORMAT
         }
         self.freq = int(freq)
-        self.format = self.format_map[audio_format]
+        self.format = self.format_map[audio_format.lower()]
         self.channels = num_channels
         self.chunk_size = chunk_size
         self.version = self.get_version()
@@ -77,7 +166,14 @@ class Mixer:
         elif open_device:
             if Mix_OpenAudio(self.freq, self.format, self.channels, self.chunk_size) < 0:
                 app.raise_error(Mix_GetError)
+        self.music_decoders = [self.app.bts(Mix_GetMusicDecoder(x)) for x in range(Mix_GetNumMusicDecoders())]
         self.destroyed = False
+
+    def set_sound_fonts(self, paths: tuple) -> None:
+        Mix_SetSoundFonts(self.app.stb(';'.join(paths)))
+
+    def set_timidity_config(self, path: str) -> None:
+        Mix_SetTimidityCfg(self.app.stb(path))
 
     @staticmethod
     def get_version() -> tuple:
