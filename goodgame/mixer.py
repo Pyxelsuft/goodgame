@@ -7,7 +7,98 @@ except:  # noqa
 
 # TODO:
 #  Finish
-#  Mix_ModMusicJumpToOrder
+#  Channel Groups
+#  Effects, etc
+#  Mix_QuickLoad_WAV, Mix_QuickLoad_RAW
+
+
+class Chunk:
+    def __init__(self, mixer: any, path: str) -> None:
+        self.app = mixer.app
+        self.path = path
+        self.chunk = Mix_LoadWAV(self.app.stb(path))
+        if not self.chunk:
+            self.app.raise_error(Mix_GetError)
+        self.channel = -1
+        self.destroyed = False
+
+    def is_playing(self) -> bool:
+        return bool(Mix_Playing(self.channel))
+
+    def is_paused(self) -> bool:
+        return bool(Mix_Paused(self.channel))
+
+    def pause(self) -> None:
+        Mix_Pause(self.channel)
+
+    def resume(self) -> None:
+        Mix_Resume(self.channel)
+
+    def get_fading_status(self) -> str:
+        status = Mix_FadingChannel(self.channel)
+        if status == MIX_FADING_OUT:
+            return 'out'
+        if status == MIX_FADING_IN:
+            return 'in'
+        return 'no'
+
+    def fade_out(self, fade_out: float) -> None:
+        Mix_FadeOutChannel(self.channel, int(fade_out * 1000))
+
+    def expire(self, time: float = -1) -> None:
+        Mix_ExpireChannel(self.channel, -1 if time == -1 else int(time * 1000))
+
+    def halt(self) -> None:
+        Mix_HaltChannel(self.channel)
+
+    def set_chunk_volume(self, volume: float = 1.0) -> None:
+        Mix_VolumeChunk(self.chunk, int(volume * MIX_MAX_VOLUME))
+
+    def set_volume(self, volume: float = 1.0) -> None:
+        Mix_Volume(self.channel, int(volume * MIX_MAX_VOLUME))
+
+    def play(self, loops: int = 0, channel: int = -1, fade_in: float = 0.0) -> None:
+        if fade_in:
+            result = Mix_FadeInChannel(channel, self.chunk, loops, int(fade_in * 1000))
+        else:
+            result = Mix_PlayChannel(channel, self.chunk, loops)
+        if result < 0:
+            self.app.raise_error(Mix_GetError)
+        self.channel = result
+
+    def play_timed(self, loops: int = 0, time: float = -1, channel: int = -1, fade_in: float = 0.0) -> None:
+        if fade_in:
+            result = Mix_FadeInChannelTimed(
+                channel, self.chunk, loops, -1 if time == -1 else int(time * 1000), int(fade_in * 1000)
+            )
+        else:
+            result = Mix_PlayChannelTimed(channel, self.chunk, loops, -1 if time == -1 else int(time * 1000))
+        if result < 0:
+            self.app.raise_error(Mix_GetError)
+        self.channel = result
+
+    def reverse(self, enabled: bool) -> None:
+        Mix_SetReverseStereo(self.channel, enabled)
+
+    def set_position(self, angle: float, distance: float) -> None:
+        Mix_SetPosition(self.channel, int(angle), int(distance * 255))
+
+    def set_distance(self, distance: float) -> None:
+        Mix_SetDistance(self.channel, int(distance * 255))
+
+    def set_panning(self, panning: tuple = (1.0, 1.0)) -> None:
+        Mix_SetPanning(self.channel, int(panning[0] * 255), int(panning[1] * 255))
+
+    def destroy(self) -> bool:
+        if self.destroyed:
+            return True
+        Mix_FreeChunk(self.chunk)
+        del self.app
+        self.destroyed = True
+        return False
+
+    def __del__(self) -> None:
+        self.destroy()
 
 
 class Music:
@@ -84,7 +175,7 @@ class Music:
         return bool(Mix_PlayingMusic())
 
     @staticmethod
-    def fading_status() -> str:
+    def get_fading_status() -> str:
         status = Mix_FadingMusic()
         if status == MIX_FADING_OUT:
             return 'out'
@@ -166,8 +257,17 @@ class Mixer:
         elif open_device:
             if Mix_OpenAudio(self.freq, self.format, self.channels, self.chunk_size) < 0:
                 app.raise_error(Mix_GetError)
+        self.channels = Mix_AllocateChannels(-1)
         self.music_decoders = [self.app.bts(Mix_GetMusicDecoder(x)) for x in range(Mix_GetNumMusicDecoders())]
+        self.chunk_decoders = [self.app.bts(Mix_GetChunkDecoder(x)) for x in range(Mix_GetNumChunkDecoders())]
         self.destroyed = False
+
+    @staticmethod
+    def set_master_volume(volume: float = 1.0) -> None:
+        Mix_MasterVolume(int(volume * MIX_MAX_VOLUME))
+
+    def allocate_channels(self, count: int) -> None:
+        self.channels = Mix_AllocateChannels(count)
 
     def set_sound_fonts(self, paths: tuple) -> None:
         Mix_SetSoundFonts(self.app.stb(';'.join(paths)))

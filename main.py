@@ -58,8 +58,11 @@ class Renderer(gg.Renderer):
         self.audio = gg.AudioDeviceManager(self.app)
         self.mixer = gg.Mixer(self.app)
         self.music = gg.Music(self.mixer, 'E:/Music/Terranigma - Underworld.mp3')
-        self.music.set_volume(0.1)
+        self.music.set_volume(0.0)
         self.music.play(-1)
+        self.chunk = gg.Chunk(self.mixer, 'e:/music/kisma - we are.wav')
+        self.chunk.set_chunk_volume(0.1)
+        self.chunk.play(fade_in=5)
         self.test_tex = self.texture_from_surface(surf)
         self.counter = 0
         self.window.show()
