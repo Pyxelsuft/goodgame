@@ -48,7 +48,7 @@ class Renderer(gg.Renderer):
         self.app: App = self.app
         self.window: Window = self.window
         self.window.set_title(f'Good Window [{self.backend.name}]')
-        # self.test_tex = self.texture_from_file('e:/other/98bug.png')
+        # self.test_tex = self.texture_from_file(self.app.p('example_files', 'img.png'))
         img = Image.open(self.app.p('example_files', 'img.png'))
         pd = img.tobytes()
         surf: gg.Surface = self.app.surface_from_bytes(
