@@ -38,7 +38,9 @@ class Window(gg.Window):
         self.renderer = Renderer(self)
 
     def on_mouse_down(self, event: gg.MouseButtonEvent) -> None:
-        if event.button in (0, 2):
+        if event.button == 0:
+            self.renderer.circle_pos = event.pos
+            self.renderer.circle_radius = 0
             self.renderer.chunk.play()
 
 
@@ -68,6 +70,8 @@ class Renderer(gg.Renderer):
         self.chunk = gg.Chunk(self.mixer, self.app.p('example_files', 'click.ogg'))
         self.chunk.set_chunk_volume(0.25)
         self.test_tex = self.texture_from_surface(surf)
+        self.circle_pos = (0, 0)
+        self.circle_radius = 10000.0
         self.counter = 0
         self.window.show()
         self.window.raise_self()
@@ -85,6 +89,13 @@ class Renderer(gg.Renderer):
         )
         self.draw_rect((0, 255, 0), (100, 100, 100, 100))
         self.draw_rect((255, 0, 0), (100.5, 100.5, 100, 100), 20)
+        self.set_scale((1, 1))
+        if self.circle_radius <= 127:
+            self.draw_circle(
+                (0, 255, 255, 255 - self.circle_radius * 2),
+                self.circle_pos, self.circle_radius
+            )
+            self.circle_radius += 150 * dt
         self.counter += dt
         self.flip()
 
