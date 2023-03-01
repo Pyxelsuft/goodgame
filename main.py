@@ -24,6 +24,7 @@ class App(gg.App):
     def on_quit(self, event: gg.QuitEvent) -> None:
         super().on_quit(event)
         self.stop_loop()
+        self.window.renderer.destroy()
         self.window.destroy()
         self.destroy()
 
