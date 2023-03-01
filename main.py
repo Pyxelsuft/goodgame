@@ -36,6 +36,10 @@ class Window(gg.Window):
         wintheme.set_window_theme(self.get_hwnd(), wintheme.THEME_DARK)
         self.renderer = Renderer(self)
 
+    def on_mouse_down(self, event: gg.MouseButtonEvent) -> None:
+        if event.button in (0, 2):
+            self.renderer.chunk.play()
+
 
 class Renderer(gg.Renderer):
     def __init__(self, window: any) -> None:
@@ -44,7 +48,7 @@ class Renderer(gg.Renderer):
         self.window: Window = self.window
         self.window.set_title(f'Good Window [{self.backend.name}]')
         # self.test_tex = self.texture_from_file('e:/other/98bug.png')
-        img = Image.open('e:/other/98bug.png')
+        img = Image.open(self.app.p('example_files', '98bug.png'))
         pd = img.tobytes()
         surf: gg.Surface = self.app.surface_from_bytes(
             pd,
@@ -57,12 +61,11 @@ class Renderer(gg.Renderer):
         self.cursors = gg.CursorManager(self.app)
         self.audio = gg.AudioDeviceManager(self.app)
         self.mixer = gg.Mixer(self.app)
-        self.music = gg.Music(self.mixer, 'E:/Music/Terranigma - Underworld.mp3')
-        self.music.set_volume(0.0)
+        self.music = gg.Music(self.mixer, self.app.p('example_files', 'Terranigma - Underworld.mp3'))
+        self.music.set_volume(0.1)
         self.music.play(-1)
-        self.chunk = gg.Chunk(self.mixer, wav_data=open('e:/music/kisma - we are.wav', 'rb').read())
-        self.chunk.set_chunk_volume(0.1)
-        self.chunk.play(fade_in=5)
+        self.chunk = gg.Chunk(self.mixer, self.app.p('example_files', 'click.ogg'))
+        self.chunk.set_chunk_volume(0.25)
         self.test_tex = self.texture_from_surface(surf)
         self.counter = 0
         self.window.show()
