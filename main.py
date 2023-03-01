@@ -10,7 +10,7 @@ class App(gg.App):
     def __init__(self) -> None:
         super().__init__()
         # self.cwd = os.path.dirname(__file__) or os.getcwd()
-        self.init(sdl_flags_list=('video', 'events', 'timer', 'audio'))
+        self.init(sdl_flags_list=('video', 'events', 'timer', 'audio'), mixer_formats=('mp3', 'ogg'))
         self.window = Window(self, (800, 600))
         self.clock = gg.Clock()
         self.clock.reset()
@@ -56,6 +56,8 @@ class Renderer(gg.Renderer):
         surf.blit_scaled(surf, (0, 0, 50, 50), (100, 100, 200, 125))
         self.cursors = gg.CursorManager(self.app)
         self.audio = gg.AudioDeviceManager(self.app)
+        self.mixer = gg.Mixer(self.app)
+        self.music = gg.Music(self.mixer, 'E:/Music/Terranigma - Underworld.mp3')
         self.test_tex = self.texture_from_surface(surf)
         self.counter = 0
         self.window.show()
@@ -72,8 +74,8 @@ class Renderer(gg.Renderer):
             angle=math.sin(self.counter) * 10,
             flip_horizontal=(self.counter * 4) % 2 >= 1
         )
+        self.draw_rect((0, 255, 0), (100, 100, 100, 100))
         self.draw_rect((255, 0, 0), (100.5, 100.5, 100, 100), 20)
-        self.draw_rect((255, 0, 0), (100, 100, 100, 100))
         self.counter += dt
         self.flip()
 

@@ -83,6 +83,7 @@ class App:
         self.get_preferred_locales()
         # TODO:
         #  math
+        #  set destroyed = True everywhere at start on __init__
         #  gifs (animations) loading
         #  controllers, joysticks, sensor, etc.
         #  pixels (palettes, etc)

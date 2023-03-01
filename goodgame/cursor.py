@@ -1,5 +1,4 @@
 import ctypes
-
 from .surface import Surface
 from sdl2 import *
 
