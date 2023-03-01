@@ -49,7 +49,7 @@ class Renderer(gg.Renderer):
         self.window: Window = self.window
         self.window.set_title(f'Good Window [{self.backend.name}]')
         # self.test_tex = self.texture_from_file('e:/other/98bug.png')
-        img = Image.open(self.app.p('example_files', '98bug.png'))
+        img = Image.open(self.app.p('example_files', 'img.png'))
         pd = img.tobytes()
         surf: gg.Surface = self.app.surface_from_bytes(
             pd,
@@ -62,7 +62,7 @@ class Renderer(gg.Renderer):
         self.cursors = gg.CursorManager(self.app)
         self.audio = gg.AudioDeviceManager(self.app)
         self.mixer = gg.Mixer(self.app)
-        self.music = gg.Music(self.mixer, self.app.p('example_files', 'Terranigma - Underworld.mp3'))
+        self.music = gg.Music(self.mixer, self.app.p('example_files', 'music.mp3'))
         self.music.set_volume(0.1)
         self.music.play(-1)
         self.chunk = gg.Chunk(self.mixer, self.app.p('example_files', 'click.ogg'))
