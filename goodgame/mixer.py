@@ -1,3 +1,5 @@
+import array
+import ctypes
 from sdl2 import *
 try:
     from sdl2.sdlmixer import *
@@ -6,17 +8,25 @@ except:  # noqa
 
 
 # TODO:
-#  Finish
-#  Channel Groups
 #  Effects, etc
-#  Mix_QuickLoad_WAV, Mix_QuickLoad_RAW
 
 
 class Chunk:
-    def __init__(self, mixer: any, path: str) -> None:
+    def __init__(self, mixer: any, path: str = None, wav_data: bytes = None, raw_data: bytes = None) -> None:
         self.app = mixer.app
         self.path = path
-        self.chunk = Mix_LoadWAV(self.app.stb(path))
+        if raw_data:
+            self.buffer = array.array('B', raw_data)
+            addr, count = self.buffer.buffer_info()
+            self.chunk = Mix_QuickLoad_RAW(ctypes.cast(addr, ctypes.POINTER(ctypes.c_ubyte)), len(raw_data))
+        elif wav_data:
+            self.buffer = array.array('B', wav_data)
+            addr, count = self.buffer.buffer_info()
+            self.chunk = Mix_QuickLoad_WAV(ctypes.cast(addr, ctypes.POINTER(ctypes.c_ubyte)))
+        elif path:
+            self.chunk = Mix_LoadWAV(self.app.stb(path))
+        else:
+            raise RuntimeError('No Chunk Audio Data')
         if not self.chunk:
             self.app.raise_error(Mix_GetError)
         self.channel = -1
