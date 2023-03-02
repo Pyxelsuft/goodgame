@@ -10,8 +10,6 @@ except:  # noqa
 
 class TTF:
     def __init__(self, app: any, path: str, size: float, index: int = 0) -> None:
-        # TODO:
-        #  including glyph, measure functions
         self.app = app
         self.size = int(size)
         self.scale = (1.0, 1.0)
@@ -38,16 +36,43 @@ class TTF:
         self.fixed_width = bool(TTF_FontFaceIsFixedWidth(self.font))
         self.face = app.bts(TTF_FontFaceFamilyName(self.font))
         self.face_style = app.bts(TTF_FontFaceStyleName(self.font))
+        self.sdf = bool(TTF_GetFontSDF(self.font))
+        self.hinting = self.r_hint_map[TTF_GetFontHinting(self.font)]
         self.height = 0
         self.ascent = 0
         self.descent = 0
         self.line_skip = 0
         self.kerning = False
-        self.hinting = self.r_hint_map[TTF_GetFontHinting(self.font)]
         self.wrapped_align = 'left'
         self.update_styles()
         self.update_vars()
         self.destroyed = False
+
+    def set_sdf(self, sdf: bool) -> None:
+        TTF_SetFontSDF(self.font, sdf)
+
+    def set_script(self, script: str) -> None:
+        if TTF_SetFontScriptName(self.font, self.app.stb(script)) < 0:
+            self.app.raise_error(TTF_GetError)
+
+    def set_direction(self, direction: str = 'ltr') -> None:
+        if direction == 'rtl':
+            TTF_SetFontDirection(self.font, TTF_DIRECTION_RTL)
+        elif direction == 'ttb':
+            TTF_SetFontDirection(self.font, TTF_DIRECTION_TTB)
+        elif direction == 'btt':
+            TTF_SetFontDirection(self.font, TTF_DIRECTION_BTT)
+        else:
+            TTF_SetFontDirection(self.font, TTF_DIRECTION_LTR)
+
+    def char_info(self, char: str) -> tuple:
+        x1_ptr, y1_ptr, x2_ptr, y2_ptr, advance_ptr = ctypes.c_int(), ctypes.c_int(), ctypes.c_int(),\
+            ctypes.c_int(), ctypes.c_int()
+        TTF_GlyphMetrics32(self.font, ord(char), x1_ptr, y1_ptr, x2_ptr, y2_ptr, advance_ptr)
+        return x1_ptr.value, y1_ptr.value, x2_ptr.value, y2_ptr.value, advance_ptr.value
+
+    def has_char(self, char: str) -> bool:
+        return bool(TTF_GlyphIsProvided32(self.font, ord(char)))
 
     def update_vars(self) -> None:
         self.height = TTF_FontHeight(self.font)
@@ -162,7 +187,7 @@ class TTF:
             if bg:
                 surf = TTF_RenderUTF8_Shaded_Wrapped(
                     self.font,
-                    self.app.stb(text),
+                    self.app.stb(text, self.encoding),
                     SDL_Color(int(fg[0]), int(fg[1]), int(fg[2]), int(fg[3]) if len(fg) > 3 else 255),
                     SDL_Color(int(bg[0]), int(bg[1]), int(bg[2]), int(bg[3]) if len(bg) > 3 else 255),
                     int(wrap_length)
@@ -170,14 +195,14 @@ class TTF:
             else:
                 surf = TTF_RenderUTF8_Blended_Wrapped(
                     self.font,
-                    self.app.stb(text),
+                    self.app.stb(text, self.encoding),
                     SDL_Color(int(fg[0]), int(fg[1]), int(fg[2]), int(fg[3]) if len(fg) > 3 else 255),
                     int(wrap_length)
                 )
         elif bg:
             surf = TTF_RenderUTF8_LCD_Wrapped(
                 self.font,
-                self.app.stb(text),
+                self.app.stb(text, self.encoding),
                 SDL_Color(int(fg[0]), int(fg[1]), int(fg[2]), int(fg[3]) if len(fg) > 3 else 255),
                 SDL_Color(int(bg[0]), int(bg[1]), int(bg[2]), int(bg[3]) if len(bg) > 3 else 255),
                 int(wrap_length)
@@ -185,7 +210,7 @@ class TTF:
         else:
             surf = TTF_RenderUTF8_Solid_Wrapped(
                 self.font,
-                self.app.stb(text),
+                self.app.stb(text, self.encoding),
                 SDL_Color(int(fg[0]), int(fg[1]), int(fg[2]), int(fg[3]) if len(fg) > 3 else 255),
                 int(wrap_length)
             )
@@ -196,27 +221,27 @@ class TTF:
             if bg:
                 surf = TTF_RenderUTF8_Shaded(
                     self.font,
-                    self.app.stb(text),
+                    self.app.stb(text, self.encoding),
                     SDL_Color(int(fg[0]), int(fg[1]), int(fg[2]), int(fg[3]) if len(fg) > 3 else 255),
                     SDL_Color(int(bg[0]), int(bg[1]), int(bg[2]), int(bg[3]) if len(bg) > 3 else 255)
                 )
             else:
                 surf = TTF_RenderUTF8_Blended(
                     self.font,
-                    self.app.stb(text),
+                    self.app.stb(text, self.encoding),
                     SDL_Color(int(fg[0]), int(fg[1]), int(fg[2]), int(fg[3]) if len(fg) > 3 else 255)
                 )
         elif bg:
             surf = TTF_RenderUTF8_LCD(
                 self.font,
-                self.app.stb(text),
+                self.app.stb(text, self.encoding),
                 SDL_Color(int(fg[0]), int(fg[1]), int(fg[2]), int(fg[3]) if len(fg) > 3 else 255),
                 SDL_Color(int(bg[0]), int(bg[1]), int(bg[2]), int(bg[3]) if len(bg) > 3 else 255)
             )
         else:
             surf = TTF_RenderUTF8_Solid(
                 self.font,
-                self.app.stb(text),
+                self.app.stb(text, self.encoding),
                 SDL_Color(int(fg[0]), int(fg[1]), int(fg[2]), int(fg[3]) if len(fg) > 3 else 255)
             )
         return Surface(surf, self.app)
@@ -228,7 +253,7 @@ class TTF:
             if bg:
                 surf = TTF_RenderText_Shaded_Wrapped(
                     self.font,
-                    self.app.stb(text),
+                    self.app.stb(text, self.encoding),
                     SDL_Color(int(fg[0]), int(fg[1]), int(fg[2]), int(fg[3]) if len(fg) > 3 else 255),
                     SDL_Color(int(bg[0]), int(bg[1]), int(bg[2]), int(bg[3]) if len(bg) > 3 else 255),
                     int(wrap_length)
@@ -236,14 +261,14 @@ class TTF:
             else:
                 surf = TTF_RenderText_Blended_Wrapped(
                     self.font,
-                    self.app.stb(text),
+                    self.app.stb(text, self.encoding),
                     SDL_Color(int(fg[0]), int(fg[1]), int(fg[2]), int(fg[3]) if len(fg) > 3 else 255),
                     int(wrap_length)
                 )
         elif bg:
             surf = TTF_RenderText_LCD_Wrapped(
                 self.font,
-                self.app.stb(text),
+                self.app.stb(text, self.encoding),
                 SDL_Color(int(fg[0]), int(fg[1]), int(fg[2]), int(fg[3]) if len(fg) > 3 else 255),
                 SDL_Color(int(bg[0]), int(bg[1]), int(bg[2]), int(bg[3]) if len(bg) > 3 else 255),
                 int(wrap_length)
@@ -251,7 +276,7 @@ class TTF:
         else:
             surf = TTF_RenderText_Solid_Wrapped(
                 self.font,
-                self.app.stb(text),
+                self.app.stb(text, self.encoding),
                 SDL_Color(int(fg[0]), int(fg[1]), int(fg[2]), int(fg[3]) if len(fg) > 3 else 255),
                 int(wrap_length)
             )
@@ -262,27 +287,57 @@ class TTF:
             if bg:
                 surf = TTF_RenderText_Shaded(
                     self.font,
-                    self.app.stb(text),
+                    self.app.stb(text, self.encoding),
                     SDL_Color(int(fg[0]), int(fg[1]), int(fg[2]), int(fg[3]) if len(fg) > 3 else 255),
                     SDL_Color(int(bg[0]), int(bg[1]), int(bg[2]), int(bg[3]) if len(bg) > 3 else 255)
                 )
             else:
                 surf = TTF_RenderText_Blended(
                     self.font,
-                    self.app.stb(text),
+                    self.app.stb(text, self.encoding),
                     SDL_Color(int(fg[0]), int(fg[1]), int(fg[2]), int(fg[3]) if len(fg) > 3 else 255)
                 )
         elif bg:
             surf = TTF_RenderText_LCD(
                 self.font,
-                self.app.stb(text),
+                self.app.stb(text, self.encoding),
                 SDL_Color(int(fg[0]), int(fg[1]), int(fg[2]), int(fg[3]) if len(fg) > 3 else 255),
                 SDL_Color(int(bg[0]), int(bg[1]), int(bg[2]), int(bg[3]) if len(bg) > 3 else 255)
             )
         else:
             surf = TTF_RenderText_Solid(
                 self.font,
-                self.app.stb(text),
+                self.app.stb(text, self.encoding),
+                SDL_Color(int(fg[0]), int(fg[1]), int(fg[2]), int(fg[3]) if len(fg) > 3 else 255)
+            )
+        return Surface(surf, self.app)
+
+    def render_char(self, char: str, fg: any, bg: any = None, blend: bool = False) -> Surface:
+        if blend:
+            if bg:
+                surf = TTF_RenderGlyph32_Shaded(
+                    self.font,
+                    ord(char),
+                    SDL_Color(int(fg[0]), int(fg[1]), int(fg[2]), int(fg[3]) if len(fg) > 3 else 255),
+                    SDL_Color(int(bg[0]), int(bg[1]), int(bg[2]), int(bg[3]) if len(bg) > 3 else 255)
+                )
+            else:
+                surf = TTF_RenderGlyph32_Blended(
+                    self.font,
+                    ord(char),
+                    SDL_Color(int(fg[0]), int(fg[1]), int(fg[2]), int(fg[3]) if len(fg) > 3 else 255)
+                )
+        elif bg:
+            surf = TTF_RenderGlyph32_LCD(
+                self.font,
+                ord(char),
+                SDL_Color(int(fg[0]), int(fg[1]), int(fg[2]), int(fg[3]) if len(fg) > 3 else 255),
+                SDL_Color(int(bg[0]), int(bg[1]), int(bg[2]), int(bg[3]) if len(bg) > 3 else 255)
+            )
+        else:
+            surf = TTF_RenderGlyph32_Solid(
+                self.font,
+                ord(char),
                 SDL_Color(int(fg[0]), int(fg[1]), int(fg[2]), int(fg[3]) if len(fg) > 3 else 255)
             )
         return Surface(surf, self.app)

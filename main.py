@@ -85,13 +85,13 @@ class Renderer(gg.Renderer):
 
     def update(self) -> None:
         dt = self.app.clock.delta
-        self.set_scale([math.sin(self.counter) / 2 + 0.75 for _ in range(2)])
+        self.set_scale([math.sin(self.counter) / 5 + 1 for _ in range(2)])
         # self.fps_font.set_scale([math.sin(self.counter) / 2 + 0.75 for _ in range(2)])
         self.clear()
         self.blit_ex(
             self.test_tex,
             dst_rect=(80, 100),
-            angle=math.sin(self.counter) * 10,
+            angle=math.sin(self.counter * 2) * 10,
             flip_horizontal=(self.counter * 4) % 2 >= 1
         )
         self.draw_rect((0, 255, 0), (100, 100, 100, 100))
