@@ -36,13 +36,44 @@ class AudioSpec:
         return spec
 
 
+class WAV:
+    def __init__(self, spec: AudioSpec, buf_ptr: any, size: int) -> None:
+        self.spec = spec
+        self.buf_ptr = buf_ptr
+        self.size = size
+        self.destroyed = False
+
+    def destroy(self) -> bool:
+        if self.destroyed:
+            return True
+        SDL_FreeWAV(self.buf_ptr)
+        self.destroyed = True
+        return False
+
+    def __del__(self) -> None:
+        self.destroy()
+
+
 class AudioDevice:
-    def __init__(self, device_id: int, spec: AudioSpec) -> None:
+    def __init__(self, app: any, device_id: int, spec: AudioSpec) -> None:
+        self.app = app
         self.id = device_id
         self.spec = spec
         self.destroyed = False
         # TODO:
-        #  finish
+        #  finish (but why we need it when Mixer exists?)
+
+    def queue(self, data: any, size: int) -> None:
+        if SDL_QueueAudio(self.id, data, size) < 0:
+            self.app.raise_error()
+
+    def load_wav(self, path: str) -> WAV:
+        spec_ptr = SDL_AudioSpec(0, 0, 0, 0)
+        buf_ptr = ctypes.POINTER(ctypes.c_uint8)()
+        len_ptr = ctypes.c_uint32()
+        if not SDL_LoadWAV(self.app.stb(path), spec_ptr, buf_ptr, len_ptr):
+            self.app.raise_error()
+        return WAV(AudioSpec(spec_ptr, self.spec.is_capture, self.spec.device_name), buf_ptr, len_ptr.value)
 
     def lock(self) -> None:
         SDL_LockAudioDevice(self.id)
@@ -69,6 +100,7 @@ class AudioDevice:
         if self.destroyed:
             return True
         SDL_CloseAudioDevice(self.id)
+        del self.app
         self.destroyed = True
         return False
 
@@ -98,7 +130,7 @@ class AudioDeviceManager:
         )
         if device_id == 0:
             self.app.raise_error()
-        return AudioDevice(device_id, AudioSpec(spec_ptr, spec.is_capture, spec.device_name))
+        return AudioDevice(self.app, device_id, AudioSpec(spec_ptr, spec.is_capture, spec.device_name))
 
     def get_default_playback_info(self) -> AudioSpec:
         name_ptr = ctypes.c_char_p()

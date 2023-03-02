@@ -68,18 +68,17 @@ class Renderer(gg.Renderer):
         surf.blit_scaled(surf, (0, 0, 50, 50), (100, 100, 200, 125))
         self.cursors = gg.CursorManager(self.app)
         self.audio = gg.AudioDeviceManager(self.app)
-        self.device = self.audio.open_device(self.audio.default_playback_info)
         self.fps_font = gg.TTF(self.app, self.app.p('example_files', 'segoeuib.ttf'), 50)
         self.fps_font.set_kerning(False)
-        '''self.mixer = gg.Mixer(self.app)
+        self.mixer = gg.Mixer(self.app)
         self.music = gg.Music(self.mixer, self.app.p('example_files', 'music.mp3'))
         self.music.set_volume(0.1)
         self.music.play(-1)
         self.chunk = gg.Chunk(self.mixer, self.app.p('example_files', 'click.ogg'))
-        self.chunk.set_chunk_volume(0.25)'''
+        self.chunk.set_chunk_volume(0.25)
         self.test_tex = self.texture_from_surface(surf)
         self.circle_pos = (0, 0)
-        self.circle_radius = 10000.0
+        self.circle_radius = 65.0
         self.counter = 0
         self.window.show()
         self.window.raise_self()
