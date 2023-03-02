@@ -84,7 +84,7 @@ class Renderer(gg.Renderer):
         self.window.raise_self()
 
     def update(self) -> None:
-        dt = self.app.clock.delta
+        dt = self.app.clock.delta * (10 if self.app.get_key_state('2') else 1)
         self.set_scale([math.sin(self.counter) / 5 + 1 for _ in range(2)])
         # self.fps_font.set_scale([math.sin(self.counter) / 2 + 0.75 for _ in range(2)])
         self.clear()

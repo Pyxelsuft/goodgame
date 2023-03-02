@@ -1,6 +1,11 @@
 from sdl2 import *
 
 
+# TODO:
+#  improve
+#  add timers, f(t) functions, color fades maybe, etc.
+
+
 class Clock:
     def __init__(self) -> None:
         self.freq = SDL_GetPerformanceFrequency()

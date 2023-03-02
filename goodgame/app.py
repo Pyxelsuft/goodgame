@@ -90,8 +90,8 @@ class App:
         self.running = False
         self.rel_mouse_mode = False
         self.mouse_capture = False
+        self.keyboard_state_ptr = SDL_GetKeyboardState(None)
         self.sdl_event = SDL_Event()
-        self.get_preferred_locales()
         # TODO:
         #  math
         #  RW ops
@@ -99,9 +99,11 @@ class App:
         #  gifs (animations) loading
         #  joysticks, haptics, sensors, gestures, touch
         #  pixels (palettes, etc)
-        #  add keyboard buffer func (costs a lot of performance) and some other funcs
         #  In window functions move to Window?
         #  Custom message box
+
+    def get_key_state(self, key: str) -> bool:
+        return bool(self.keyboard_state_ptr[SDL_GetScancodeFromName(self.stb(key))])
 
     @staticmethod
     def get_img_version() -> tuple:
