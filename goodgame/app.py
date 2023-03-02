@@ -1,8 +1,8 @@
 import os
 import ctypes
 from .exceptions import FlagNotFoundError, SDLError
-from .events import QuitEvent, AudioDeviceEvent, DropEvent, TouchFingerEvent, KeyboardEvent, MouseMotionEvent,\
-    MouseButtonEvent, MouseWheelEvent, TextEditingEvent, TextInputEvent, DisplayEvent, WindowEvent
+from .events import CommonEvent, QuitEvent, AudioDeviceEvent, DropEvent, TouchFingerEvent, KeyboardEvent,\
+    MouseMotionEvent, MouseButtonEvent, MouseWheelEvent, TextEditingEvent, TextInputEvent, DisplayEvent, WindowEvent
 from .sdl import SDLVersion, sdl_dir
 from .surface import Surface
 from .video import PixelFormat
@@ -60,9 +60,9 @@ class App:
             SDL_DROPTEXT: lambda: self.on_drop_text(DropEvent(self.sdl_event.drop, self)),
             SDL_DROPBEGIN: lambda: self.on_drop_begin(DropEvent(self.sdl_event.drop, self)),
             SDL_DROPCOMPLETE: lambda: self.on_drop_complete(DropEvent(self.sdl_event.drop, self)),
-            SDL_FINGERMOTION: lambda: self.on_finger_motion(TouchFingerEvent(self.sdl_event.finger, self)),
-            SDL_FINGERDOWN: lambda: self.on_finger_down(TouchFingerEvent(self.sdl_event.finger, self)),
-            SDL_FINGERUP: lambda: self.on_finger_up(TouchFingerEvent(self.sdl_event.finger, self)),
+            SDL_FINGERMOTION: lambda: self.on_finger_motion(TouchFingerEvent(self.sdl_event.tfinger, self)),
+            SDL_FINGERDOWN: lambda: self.on_finger_down(TouchFingerEvent(self.sdl_event.tfinger, self)),
+            SDL_FINGERUP: lambda: self.on_finger_up(TouchFingerEvent(self.sdl_event.tfinger, self)),
             SDL_KEYDOWN: lambda: self.on_key_down(KeyboardEvent(self.sdl_event.key, self)),
             SDL_KEYUP: lambda: self.on_key_up(KeyboardEvent(self.sdl_event.key, self)),
             SDL_TEXTEDITING: lambda: self.on_text_edit(TextEditingEvent(self.sdl_event.edit, self)),
@@ -73,7 +73,17 @@ class App:
             SDL_MOUSEWHEEL: lambda: self.on_mouse_wheel(MouseWheelEvent(self.sdl_event.wheel, self)),
             SDL_TEXTINPUT: lambda: self.on_text_input(TextInputEvent(self.sdl_event.text, self)),
             SDL_DISPLAYEVENT: lambda: self.on_display_event(DisplayEvent(self.sdl_event.display, self)),
-            SDL_WINDOWEVENT: lambda: self.on_window_event(WindowEvent(self.sdl_event.window, self))
+            SDL_WINDOWEVENT: lambda: self.on_window_event(WindowEvent(self.sdl_event.window, self)),
+            SDL_APP_TERMINATING: lambda: self.on_terminate(CommonEvent(self.sdl_event.common)),
+            SDL_APP_LOWMEMORY: lambda: self.on_low_memory(CommonEvent(self.sdl_event.common)),
+            SDL_APP_WILLENTERBACKGROUND: lambda: self.on_will_enter_background(CommonEvent(self.sdl_event.common)),
+            SDL_APP_DIDENTERBACKGROUND: lambda: self.on_did_enter_background(CommonEvent(self.sdl_event.common)),
+            SDL_APP_WILLENTERFOREGROUND: lambda: self.on_will_enter_foreground(CommonEvent(self.sdl_event.common)),
+            SDL_APP_DIDENTERFOREGROUND: lambda: self.on_did_enter_foreground(CommonEvent(self.sdl_event.common)),
+            SDL_LOCALECHANGED: lambda: self.on_locale_change(CommonEvent(self.sdl_event.common)),
+            SDL_KEYMAPCHANGED: lambda: self.on_keymap_change(CommonEvent(self.sdl_event.common)),
+            SDL_RENDER_TARGETS_RESET: lambda: self.on_render_targets_reset(CommonEvent(self.sdl_event.common)),
+            SDL_RENDER_DEVICE_RESET: lambda: self.on_render_device_reset(CommonEvent(self.sdl_event.common))
         }
         self.windows = {}
         self.destroyed = False
@@ -88,7 +98,6 @@ class App:
         #  gifs (animations) loading
         #  controllers, joysticks, sensor, etc.
         #  pixels (palettes, etc)
-        #  SDL_APP and other events
         #  add keyboard buffer func (costs a lot of performance) and some other funcs
         #  In window functions move to Window?
         #  Custom message box
@@ -234,7 +243,9 @@ class App:
             self.raise_error()
 
     def get_preferred_locales(self) -> tuple:
-        return tuple({'lang': self.bts(x.language), 'country': self.bts(x.country)} for x in SDL_GetPreferredLocales())
+        return tuple(
+            {'lang': self.bts(_x.language), 'country': self.bts(x.country)} for _x in SDL_GetPreferredLocales()
+        )
 
     def get_sdl_info(self) -> dict:
         ver_ptr = SDL_version()
@@ -539,5 +550,34 @@ class App:
     def on_window_event(self, event: WindowEvent) -> None:
         event.window.event_map.get(self.sdl_event.window.event)(event)
 
+    def on_terminate(self, event: CommonEvent) -> None:
+        pass
+
+    def on_low_memory(self, event: CommonEvent) -> None:
+        pass
+
+    def on_will_enter_background(self, event: CommonEvent) -> None:
+        pass
+
+    def on_did_enter_background(self, event: CommonEvent) -> None:
+        pass
+
+    def on_will_enter_foreground(self, event: CommonEvent) -> None:
+        pass
+
+    def on_did_enter_foreground(self, event: CommonEvent) -> None:
+        pass
+
+    def on_locale_change(self, event: CommonEvent) -> None:
+        pass
+
+    def on_keymap_change(self, event: CommonEvent) -> None:
+        pass
+
+    def on_render_targets_reset(self, event: CommonEvent) -> None:
+        pass
+
+    def on_render_device_reset(self, event: CommonEvent) -> None:
+        pass
     def __del__(self) -> None:
         self.destroy()
