@@ -24,6 +24,7 @@ class App(gg.App):
     def on_quit(self, event: gg.QuitEvent) -> None:
         super().on_quit(event)
         self.stop_loop()
+        self.window.renderer.fps_font.destroy()
         self.window.renderer.destroy()
         self.window.destroy()
         self.destroy()
@@ -67,6 +68,7 @@ class Renderer(gg.Renderer):
         surf.blit_scaled(surf, (0, 0, 50, 50), (100, 100, 200, 125))
         self.cursors = gg.CursorManager(self.app)
         self.audio = gg.AudioDeviceManager(self.app)
+        self.fps_font = gg.TTF(self.app, self.app.p('example_files', 'segoeuib.ttf'), 50)
         self.mixer = gg.Mixer(self.app)
         self.music = gg.Music(self.mixer, self.app.p('example_files', 'music.mp3'))
         self.music.set_volume(0.1)
@@ -82,7 +84,6 @@ class Renderer(gg.Renderer):
 
     def update(self) -> None:
         dt = self.app.clock.delta
-        self.window.set_title(f'FPS: {self.app.clock.get_fps()}')
         self.set_scale([math.sin(self.counter) / 2 + 0.75 for _ in range(2)])
         self.clear()
         self.blit_ex(
@@ -100,6 +101,9 @@ class Renderer(gg.Renderer):
                 self.circle_pos, self.circle_radius
             )
             self.circle_radius += 150 * dt
+        self.blit(self.texture_from_surface(
+            self.fps_font.render_text(f'FPS: {self.app.clock.get_fps()}', (0, 255, 255), blend=True)
+        ), dst_rect=(0, 0))
         self.counter += dt
         self.flip()
 

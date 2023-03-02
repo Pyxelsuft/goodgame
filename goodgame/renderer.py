@@ -3,6 +3,7 @@ from .video import Backend, BackendManager
 from .surface import Surface
 from .texture import Texture
 from sdl2 import *
+
 try:
     from sdl2.sdlimage import *
 except:  # noqa
@@ -11,6 +12,7 @@ try:
     from sdl2.sdlgfx import *
 except Exception as _err:
     from .sdlgfx import *
+
     print(f'Failed to import SDL2_gfx [{_err}]. Using extremely slow and unfinished software fallback!')
 
 
@@ -37,7 +39,7 @@ class Renderer:
         #  check out of bounds (check if this handled automatic by sdl); SDL_RenderReadPixels
         #  SDL_RenderGeometry, SDL_RenderGeometryRaw
         #  Fix Scaling for SDL2_gfx
-    
+
     def window_to_logical(self, pos: any) -> tuple:
         w_ptr, h_ptr = ctypes.c_float(), ctypes.c_float()
         SDL_RenderWindowToLogical(self.renderer, int(pos[0]), int(pos[1]), w_ptr, h_ptr)
@@ -104,8 +106,8 @@ class Renderer:
             self.renderer,
             texture.texture,
             src_rect and SDL_FRect(src_rect[0], src_rect[1], src_rect[2], src_rect[3]),
-            dst_rect and SDL_FRect(dst_rect[0], dst_rect[1], dst_rect[2], dst_rect[3]) if len(dst_rect) > 2 else
-            SDL_FRect(dst_rect[0], dst_rect[1], texture.get_w(), texture.get_h())
+            dst_rect and (SDL_FRect(dst_rect[0], dst_rect[1], dst_rect[2], dst_rect[3]) if len(dst_rect) > 2 else
+                          SDL_FRect(dst_rect[0], dst_rect[1], texture.get_w(), texture.get_h()))
         )
 
     def blit_ex(
@@ -116,8 +118,8 @@ class Renderer:
             self.renderer,
             texture.texture,
             src_rect and SDL_FRect(src_rect[0], src_rect[1], src_rect[2], src_rect[3]),
-            dst_rect and SDL_FRect(dst_rect[0], dst_rect[1], dst_rect[2], dst_rect[3]) if len(dst_rect) > 2 else
-            SDL_FRect(dst_rect[0], dst_rect[1], texture.get_w(), texture.get_h()),
+            dst_rect and (SDL_FRect(dst_rect[0], dst_rect[1], dst_rect[2], dst_rect[3]) if len(dst_rect) > 2 else
+                          SDL_FRect(dst_rect[0], dst_rect[1], texture.get_w(), texture.get_h())),
             angle,
             center and SDL_FPoint(center[0], center[1]),
             ((flip_horizontal and SDL_FLIP_HORIZONTAL) | (flip_vertical and SDL_FLIP_VERTICAL)) or SDL_FLIP_NONE

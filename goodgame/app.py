@@ -92,6 +92,11 @@ class App:
         #  In window functions move to Window?
         #  Custom message box
 
+    @staticmethod
+    def get_img_version() -> tuple:
+        ver = IMG_Linked_Version().contents
+        return ver.major, ver.minor, ver.patch
+
     def set_mouse_capture(self, enabled: bool) -> None:
         self.mouse_capture = enabled
         SDL_CaptureMouse(enabled)
