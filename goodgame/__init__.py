@@ -3,7 +3,7 @@ from .app import App
 from .clock import Clock
 from .events import CommonEvent, QuitEvent, AudioDeviceEvent, DropEvent, TouchFingerEvent, KeyboardEvent,\
     MouseMotionEvent, MouseButtonEvent, MouseWheelEvent, TextEditingEvent, TextInputEvent, DisplayEvent, WindowEvent
-from .audio import AudioDeviceManager, AudioSpec
+from .audio import AudioDeviceManager, AudioSpec, AudioDevice
 from .video import BackendManager, Backend, DisplaysManager, Display, DisplayMode, PixelFormat
 from .window import Window
 from .surface import Surface
