@@ -94,9 +94,10 @@ class App:
         self.get_preferred_locales()
         # TODO:
         #  math
+        #  RW ops
         #  set destroyed = True everywhere at start on __init__
         #  gifs (animations) loading
-        #  controllers, joysticks, sensor, etc.
+        #  joysticks, haptics, sensors, gestures, touch
         #  pixels (palettes, etc)
         #  add keyboard buffer func (costs a lot of performance) and some other funcs
         #  In window functions move to Window?
@@ -244,7 +245,7 @@ class App:
 
     def get_preferred_locales(self) -> tuple:
         return tuple(
-            {'lang': self.bts(_x.language), 'country': self.bts(x.country)} for _x in SDL_GetPreferredLocales()
+            {'lang': self.bts(_x.language), 'country': self.bts(_x.country)} for _x in SDL_GetPreferredLocales()
         )
 
     def get_sdl_info(self) -> dict:
