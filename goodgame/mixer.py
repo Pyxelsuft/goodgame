@@ -269,8 +269,8 @@ class Mixer:
             if Mix_OpenAudio(self.freq, self.format, self.channels, self.chunk_size) < 0:
                 app.raise_error(Mix_GetError)
         self.channels = Mix_AllocateChannels(-1)
-        self.music_decoders = [self.app.bts(Mix_GetMusicDecoder(x)) for x in range(Mix_GetNumMusicDecoders())]
-        self.chunk_decoders = [self.app.bts(Mix_GetChunkDecoder(x)) for x in range(Mix_GetNumChunkDecoders())]
+        self.music_decoders = [self.app.bts(Mix_GetMusicDecoder(_x)) for _x in range(Mix_GetNumMusicDecoders())]
+        self.chunk_decoders = [self.app.bts(Mix_GetChunkDecoder(_x)) for _x in range(Mix_GetNumChunkDecoders())]
         self.destroyed = False
 
     @staticmethod
