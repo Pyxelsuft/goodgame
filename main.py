@@ -43,6 +43,10 @@ class Window(gg.Window):
             self.renderer.circle_radius = 0
             self.renderer.chunk.play()
 
+    def on_key_down(self, event: gg.KeyboardEvent) -> None:
+        if event.sym == '1':
+            self.renderer.set_vsync(not self.renderer.vsync)
+
 
 class Renderer(gg.Renderer):
     def __init__(self, window: any) -> None:
@@ -90,9 +94,9 @@ class Renderer(gg.Renderer):
         self.draw_rect((0, 255, 0), (100, 100, 100, 100))
         self.draw_rect((255, 0, 0), (100.5, 100.5, 100, 100), 20)
         self.set_scale((1, 1))
-        if self.circle_radius <= 127:
+        if self.circle_radius <= 64:
             self.draw_circle(
-                (0, 255, 255, 255 - self.circle_radius * 2),
+                (0, 255, 255, 255 - self.circle_radius * 4),
                 self.circle_pos, self.circle_radius
             )
             self.circle_radius += 150 * dt

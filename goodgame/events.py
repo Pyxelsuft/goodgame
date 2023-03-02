@@ -67,10 +67,10 @@ class KeyboardEvent(CommonEvent):
         self.repeat = event.repeat
         if self.repeat:
             self.event = 'hold'
-        self.scancode = event.keysym.scancode
-        self.scancode_name = app.bts(SDL_GetScancodeName(self.scancode))
-        self.sym = event.keysym.sym
-        self.sym_name = app.bts(SDL_GetKeyName(self.sym))
+        self.scancode_id = event.keysym.scancode
+        self.scancode = app.bts(SDL_GetScancodeName(self.scancode_id))
+        self.sym_id = event.keysym.sym
+        self.sym = app.bts(SDL_GetKeyName(self.sym_id))
         self.mod = event.keysym.mod
         self.window_id = event.windowID
         self.window = app.windows[self.window_id]
