@@ -1,6 +1,7 @@
 import array
 import ctypes
 from sdl2 import *
+
 try:
     from sdl2.sdlmixer import *
 except:  # noqa

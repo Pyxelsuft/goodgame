@@ -8,6 +8,7 @@ from .surface import Surface
 from .video import PixelFormat
 from .window import Window
 from sdl2 import *
+
 try:
     from sdl2.sdlimage import *
 except Exception as _err:

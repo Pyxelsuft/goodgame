@@ -503,7 +503,7 @@ def _ellipseRGBA(
         ellipseOverscan = DEFAULT_ELLIPSE_OVERSCAN
     oldX = scrX = 0
     oldY = scrY = ryi
-    result |= _drawQuadrants(renderer, x, y, 0, ry, f)
+    result |= _drawQuadrants(renderer, x, y, 0, ry, _f)
 
     rxi *= ellipseOverscan
     ryi *= ellipseOverscan
@@ -527,7 +527,7 @@ def _ellipseRGBA(
         scrX = curX // ellipseOverscan
         scrY = curY // ellipseOverscan
         if (not scrX == oldX and scrY == oldY) or (not scrX == oldX and not scrY == oldY):
-            result |= _drawQuadrants(renderer, x, y, scrX, scrY, f)
+            result |= _drawQuadrants(renderer, x, y, scrX, scrY, _f)
             oldX = scrX
             oldY = scrY
 
@@ -549,7 +549,7 @@ def _ellipseRGBA(
             if (not scrX == oldX and scrY == oldY) or (not scrX == oldX and not scrY == oldY):
                 oldY -= 1
                 while oldY >= scrY:
-                    result |= _drawQuadrants(renderer, x, y, scrX, oldY, f)
+                    result |= _drawQuadrants(renderer, x, y, scrX, oldY, _f)
                     if _f:
                         oldY = scrY - 1
                     oldY -= 1
@@ -558,7 +558,7 @@ def _ellipseRGBA(
         if not _f:
             oldY -= 1
             while oldY >= 0:
-                result |= _drawQuadrants(renderer, x, y, scrX, oldY, f)
+                result |= _drawQuadrants(renderer, x, y, scrX, oldY, _f)
                 oldY -= 1
 
     return result

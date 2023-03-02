@@ -12,7 +12,6 @@ try:
     from sdl2.sdlgfx import *
 except Exception as _err:
     from .sdlgfx import *
-
     print(f'Failed to import SDL2_gfx [{_err}]. Using extremely slow and unfinished software fallback!')
 
 

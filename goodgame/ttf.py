@@ -2,6 +2,7 @@ import ctypes
 import struct
 from .surface import Surface
 from sdl2 import *
+
 try:
     from sdl2.sdlttf import *
 except:  # noqa
