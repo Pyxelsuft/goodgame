@@ -35,7 +35,6 @@ class Renderer:
         self.destroyed = False
         # TODO:
         #  check out of bounds (check if this handled automatic by sdl); SDL_RenderReadPixels
-        #  read keyboard functions
         #  SDL_RenderGeometry, SDL_RenderGeometryRaw
         #  Fix Scaling for SDL2_gfx
     
