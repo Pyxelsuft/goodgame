@@ -5,16 +5,17 @@ from sdl2 import *
 
 class Texture:
     def __init__(self, texture: SDL_Texture, renderer: any) -> None:
+        self.destroyed = True
         if not texture:
             renderer.app.raise_error()
         self.app = renderer.app
         self.renderer = renderer
         self.texture = texture
-        self.destroyed = False
         self.scale_mode = self.get_scale_mode()
         self.color_mod = self.get_color_mod()
         self.alpha_mod = self.get_alpha_mod()
         self.blend_mode = self.get_blend_mode_int()
+        self.destroyed = False
 
     def get_scale_mode(self) -> str:
         scale_mode_ptr = ctypes.c_int()

@@ -15,10 +15,10 @@ class Window:
             skip_taskbar: bool = False,
             window_type: str = None
     ) -> None:
+        self.destroyed = True
         self.app = app
         self.x, self.y = pos or (SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED)
         self.w, self.h = size
-        self.destroyed = False
         self.window = SDL_CreateWindow(
             app.stb('Good Window'),
             self.x, self.y,
@@ -73,8 +73,8 @@ class Window:
         self.update_size()
         self.display_mode = self.get_display_mode()
         self.id = SDL_GetWindowID(self.window)
-        self.get_icc_profile()
         app.windows[self.id] = self
+        self.destroyed = False
         # TODO:
         #  gamma ramp, hit test (maybe no?) and other spec. things
 
@@ -132,7 +132,7 @@ class Window:
         size_ptr = ctypes.c_size_t()
         data_ptr = SDL_GetWindowICCProfile(self.window, size_ptr)
         data_buf = (ctypes.c_uint8 * size_ptr.value).from_address(data_ptr)
-        return bytes(data_buf[x] for x in range(size_ptr.value))
+        return bytes(data_buf[:size_ptr.value])  # noqa
 
     def set_title(self, title: str) -> None:
         SDL_SetWindowTitle(self.window, self.app.stb(title))

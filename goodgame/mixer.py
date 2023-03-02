@@ -14,6 +14,7 @@ except:  # noqa
 
 class Chunk:
     def __init__(self, mixer: any, path: str = None, wav_data: bytes = None, raw_data: bytes = None) -> None:
+        self.destroyed = True
         self.app = mixer.app
         self.path = path
         if raw_data:
@@ -114,6 +115,7 @@ class Chunk:
 
 class Music:
     def __init__(self, mixer: any, path: str) -> None:
+        self.destroyed = True
         self.app = mixer.app
         self.path = path
         self.music = Mix_LoadMUS(self.app.stb(path))
@@ -232,6 +234,7 @@ class Mixer:
             open_device: bool = True,
             device: str = None
     ) -> None:
+        self.destroyed = True
         self.app = app
         self.format_map = {
             'u8': AUDIO_U8,

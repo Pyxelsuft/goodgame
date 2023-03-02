@@ -10,6 +10,7 @@ except:  # noqa
 class Surface:
     def __init__(self, surf: SDL_Surface, app: any) -> None:
         # TODO: lazy SDL_ConvertPixels
+        self.destroyed = True
         if not surf:
             app.raise_error()
         self.app = app

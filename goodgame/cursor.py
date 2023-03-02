@@ -5,6 +5,7 @@ from sdl2 import *
 
 class Cursor:
     def __init__(self, cursor: SDL_Cursor) -> None:
+        self.destroyed = True
         self.cursor = cursor
         self.destroyed = False
 
@@ -21,6 +22,7 @@ class Cursor:
 
 class CursorManager:
     def __init__(self, app: any) -> None:
+        self.destroyed = True
         self.app = app
         self.default = Cursor(SDL_GetDefaultCursor())
         self.system = {

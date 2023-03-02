@@ -38,6 +38,7 @@ class AudioSpec:
 
 class WAV:
     def __init__(self, spec: AudioSpec, buf_ptr: any, size: int) -> None:
+        self.destroyed = True
         self.spec = spec
         self.buf_ptr = buf_ptr
         self.size = size
@@ -56,6 +57,7 @@ class WAV:
 
 class AudioDevice:
     def __init__(self, app: any, device_id: int, spec: AudioSpec) -> None:
+        self.destroyed = True
         self.app = app
         self.id = device_id
         self.spec = spec

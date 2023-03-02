@@ -22,6 +22,7 @@ class Renderer:
             backend: Backend = None,
             vsync: bool = False
     ) -> None:
+        self.destroyed = True
         self.app = window.app
         self.window = window
         self.backend = backend or BackendManager(self.app).get_best()
@@ -35,8 +36,8 @@ class Renderer:
         self.render_target_supported = bool(SDL_RenderTargetSupported(self.renderer))
         self.destroyed = False
         # TODO:
-        #  check out of bounds (check if this handled automatic by sdl); SDL_RenderReadPixels
-        #  SDL_RenderGeometry, SDL_RenderGeometryRaw
+        #  check out of bounds (check if this handled automatic by sdl)
+        #  SDL_RenderReadPixels, SDL_RenderGeometry, SDL_RenderGeometryRaw
         #  Fix Scaling for SDL2_gfx
 
     def window_to_logical(self, pos: any) -> tuple:

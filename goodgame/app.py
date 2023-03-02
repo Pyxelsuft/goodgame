@@ -25,6 +25,7 @@ except Exception as _err:
 
 class App:
     def __init__(self) -> None:
+        self.destroyed = True
         self.encoding = 'utf-8'
         if SDL_BYTEORDER == SDL_LIL_ENDIAN:
             self.endian = 'little'
@@ -86,16 +87,15 @@ class App:
             SDL_RENDER_DEVICE_RESET: lambda: self.on_render_device_reset(CommonEvent(self.sdl_event.common))
         }
         self.windows = {}
-        self.destroyed = False
         self.running = False
         self.rel_mouse_mode = False
         self.mouse_capture = False
         self.keyboard_state_ptr = SDL_GetKeyboardState(None)
         self.sdl_event = SDL_Event()
+        self.destroyed = False
         # TODO:
         #  math
         #  RW ops
-        #  set destroyed = True everywhere at start on __init__
         #  gifs (animations) loading
         #  joysticks, haptics, sensors, gestures, touch
         #  pixels (palettes, etc)

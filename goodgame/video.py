@@ -71,6 +71,7 @@ class Display:
 
 class DisplaysManager:
     def __init__(self, app: any) -> None:
+        self.destroyed = True
         self.app = app
         self.displays = [Display(i, app) for i in range(SDL_GetNumVideoDisplays())]
         self.destroyed = False

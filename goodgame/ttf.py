@@ -11,6 +11,7 @@ except:  # noqa
 
 class TTF:
     def __init__(self, app: any, path: str, size: float, index: int = 0) -> None:
+        self.destroyed = True
         self.app = app
         self.size = int(size)
         self.scale = (1.0, 1.0)
