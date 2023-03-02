@@ -11,12 +11,20 @@ except:  # noqa
 class TTF:
     def __init__(self, app: any, path: str, size: float, index: int = 0) -> None:
         # TODO:
-        #  font size and dpi functions
-        #  other functions (including glyph; measure)
+        #  including glyph, measure functions
         self.app = app
         self.size = int(size)
+        self.scale = (1.0, 1.0)
         self.encoding = app.encoding
         self.unicode_encoding = 'utf-16'
+        self.hint_map = {
+            'normal': TTF_HINTING_NORMAL,
+            'light': TTF_HINTING_LIGHT,
+            'mono': TTF_HINTING_MONO,
+            'none': TTF_HINTING_NONE,
+            'light_subpixel': TTF_HINTING_LIGHT_SUBPIXEL
+        }
+        self.r_hint_map = {b: a for a, b in self.hint_map.items()}
         self.font = TTF_OpenFontIndex(app.stb(path), self.size, index)
         if not self.font:
             app.raise_error(TTF_GetError)
@@ -26,10 +34,60 @@ class TTF:
         self.underline = False
         self.strike_through = False
         self.outline = TTF_GetFontOutline(self.font)
+        self.faces = TTF_FontFaces(self.font)
+        self.fixed_width = bool(TTF_FontFaceIsFixedWidth(self.font))
         self.face = app.bts(TTF_FontFaceFamilyName(self.font))
         self.face_style = app.bts(TTF_FontFaceStyleName(self.font))
+        self.height = 0
+        self.ascent = 0
+        self.descent = 0
+        self.line_skip = 0
+        self.kerning = False
+        self.hinting = self.r_hint_map[TTF_GetFontHinting(self.font)]
+        self.wrapped_align = 'left'
         self.update_styles()
+        self.update_vars()
         self.destroyed = False
+
+    def update_vars(self) -> None:
+        self.height = TTF_FontHeight(self.font)
+        self.ascent = TTF_FontAscent(self.font)
+        self.descent = TTF_FontDescent(self.font)
+        self.line_skip = TTF_FontLineSkip(self.font)
+        self.kerning = bool(TTF_GetFontKerning(self.font))
+
+    def set_kerning(self, kerning: bool) -> None:
+        self.kerning = kerning
+        TTF_SetFontKerning(self.font, kerning)
+
+    def set_wrapped_align(self, wrapped_align: str) -> None:
+        self.wrapped_align = wrapped_align
+        if wrapped_align == 'center':
+            TTF_SetFontWrappedAlign(self.font, TTF_WRAPPED_ALIGN_CENTER)
+        elif wrapped_align == 'right':
+            TTF_SetFontWrappedAlign(self.font, TTF_WRAPPED_ALIGN_RIGHT)
+        else:
+            TTF_SetFontWrappedAlign(self.font, TTF_WRAPPED_ALIGN_LEFT)
+
+    def set_hinting(self, hinting: str = 'normal') -> None:
+        self.hinting = hinting
+        TTF_SetFontHinting(self.font, self.hint_map[hinting])
+
+    def set_size(self, size: float) -> None:
+        self.size = int(size)
+        TTF_SetFontSizeDPI(
+            self.font, self.size,
+            int(72 * self.scale[0]), int(72 * self.scale[1])
+        )
+        self.update_vars()
+
+    def set_scale(self, scale: any = (1.0, 1.0)) -> None:
+        self.scale = scale
+        TTF_SetFontSizeDPI(
+            self.font, self.size,
+            int(72 * self.scale[0]), int(72 * self.scale[1])
+        )
+        self.update_vars()
 
     def render_unicode_wrapped(
             self, text: str, fg: any, bg: any = None, blend: bool = False, wrap_length: float = 0.0
