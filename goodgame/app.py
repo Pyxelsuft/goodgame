@@ -23,6 +23,28 @@ except Exception as _err:
     print(f'Failed to import SDL2_ttf [{_err}]. Font loading and rendering will be disabled!')
 
 
+try:
+    SDL_TEXTEDITING_EXT = SDL_TEXTEDITING_EXT
+except NameError:
+    SDL_TEXTEDITING_EXT = 0x305
+try:
+    SDL_DISPLAYEVENT = SDL_DISPLAYEVENT
+except NameError:
+    SDL_DISPLAYEVENT = 0x150
+try:
+    SDL_LOCALECHANGED = SDL_LOCALECHANGED
+except NameError:
+    SDL_LOCALECHANGED = 0x107
+try:
+    SDL_KEYMAPCHANGED = SDL_KEYMAPCHANGED
+except NameError:
+    SDL_KEYMAPCHANGED = 0x304
+try:
+    SDL_INIT_SENSOR = SDL_INIT_SENSOR
+except NameError:
+    SDL_INIT_SENSOR = 0x00008000
+
+
 class App:
     def __init__(self) -> None:
         self.destroyed = True
@@ -83,28 +105,12 @@ class App:
             SDL_APP_WILLENTERFOREGROUND: lambda: self.on_will_enter_foreground(CommonEvent(self.sdl_event.common)),
             SDL_APP_DIDENTERFOREGROUND: lambda: self.on_did_enter_foreground(CommonEvent(self.sdl_event.common)),
             SDL_RENDER_TARGETS_RESET: lambda: self.on_render_targets_reset(CommonEvent(self.sdl_event.common)),
-            SDL_RENDER_DEVICE_RESET: lambda: self.on_render_device_reset(CommonEvent(self.sdl_event.common))
+            SDL_RENDER_DEVICE_RESET: lambda: self.on_render_device_reset(CommonEvent(self.sdl_event.common)),
+            SDL_TEXTEDITING_EXT: lambda: self.on_text_edit_ext(TextEditingEvent(self.sdl_event.edit, self)),
+            SDL_DISPLAYEVENT: lambda: self.on_display_event(DisplayEvent(self.sdl_event.display, self)),
+            SDL_LOCALECHANGED: lambda: self.on_locale_change(CommonEvent(self.sdl_event.common)),
+            SDL_KEYMAPCHANGED: lambda: self.on_keymap_change(CommonEvent(self.sdl_event.common))
         }
-        try:
-            self.event_map[SDL_TEXTEDITING_EXT] = lambda: self.on_text_edit_ext(
-                TextEditingEvent(self.sdl_event.edit, self)
-            )
-        except NameError:
-            self.event_map[0x305] = lambda: self.on_text_edit_ext(
-                TextEditingEvent(self.sdl_event.edit, self)
-            )
-        try:
-            self.event_map[SDL_DISPLAYEVENT] = lambda: self.on_display_event(DisplayEvent(self.sdl_event.display, self))
-        except NameError:
-            self.event_map[0x150] = lambda: self.on_display_event(DisplayEvent(self.sdl_event.display, self))
-        try:
-            self.event_map[SDL_LOCALECHANGED] = lambda: self.on_locale_change(CommonEvent(self.sdl_event.common))
-        except NameError:
-            self.event_map[0x107] = lambda: self.on_locale_change(CommonEvent(self.sdl_event.common))
-        try:
-            self.event_map[SDL_KEYMAPCHANGED] = lambda: self.on_keymap_change(CommonEvent(self.sdl_event.common))
-        except NameError:
-            self.event_map[0x304] = lambda: self.on_keymap_change(CommonEvent(self.sdl_event.common))
         self.windows = {}
         self.running = False
         self.rel_mouse_mode = False
