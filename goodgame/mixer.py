@@ -134,15 +134,26 @@ class Music:
             MUS_MODPLUG_UNUSED: 'MODPLUG_UNUSED',
             MUS_OPUS: 'OPUS'
         }.get(Mix_GetMusicType(self.music))
-        self.title = self.app.bts(Mix_GetMusicTitle(self.music))
-        self.title_tag = self.app.bts(Mix_GetMusicTitleTag(self.music))
-        self.artist_tag = self.app.bts(Mix_GetMusicArtistTag(self.music))
-        self.album_tag = self.app.bts(Mix_GetMusicAlbumTag(self.music))
-        self.copyright_tag = self.app.bts(Mix_GetMusicCopyrightTag(self.music))
-        self.duration = Mix_MusicDuration(self.music)
-        self.loop_start = Mix_GetMusicLoopStartTime(self.music)
-        self.loop_end = Mix_GetMusicLoopEndTime(self.music)
-        self.loop_length = Mix_GetMusicLoopLengthTime(self.music)
+        try:
+            self.title = self.app.bts(Mix_GetMusicTitle(self.music))
+            self.title_tag = self.app.bts(Mix_GetMusicTitleTag(self.music))
+            self.artist_tag = self.app.bts(Mix_GetMusicArtistTag(self.music))
+            self.album_tag = self.app.bts(Mix_GetMusicAlbumTag(self.music))
+            self.copyright_tag = self.app.bts(Mix_GetMusicCopyrightTag(self.music))
+            self.duration = Mix_MusicDuration(self.music)
+            self.loop_start = Mix_GetMusicLoopStartTime(self.music)
+            self.loop_end = Mix_GetMusicLoopEndTime(self.music)
+            self.loop_length = Mix_GetMusicLoopLengthTime(self.music)
+        except RuntimeError:
+            self.title = ''
+            self.title_tag = ''
+            self.artist_tag = ''
+            self.album_tag = ''
+            self.copyright_tag = ''
+            self.duration = 0.0
+            self.loop_start = 0.0
+            self.loop_end = 0.0
+            self.loop_length = 0.0
         self.destroyed = False
 
     def play(self, loops: int = 0, fade_in: float = 0.0, pos: float = 0.0) -> None:
