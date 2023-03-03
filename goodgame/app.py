@@ -43,6 +43,10 @@ try:
     SDL_INIT_SENSOR = SDL_INIT_SENSOR
 except NameError:
     SDL_INIT_SENSOR = 0x00008000
+try:
+    IMG_INIT_JXL = IMG_INIT_JXL
+except NameError:
+    IMG_INIT_JXL = 0x00000010
 
 
 class App:
