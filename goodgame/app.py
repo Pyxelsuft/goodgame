@@ -49,9 +49,12 @@ class App:
             'none': SDL_BLENDMODE_NONE,
             'blend': SDL_BLENDMODE_BLEND,
             'add': SDL_BLENDMODE_ADD,
-            'mod': SDL_BLENDMODE_MOD,
-            'mul': SDL_BLENDMODE_MUL
+            'mod': SDL_BLENDMODE_MOD
         }
+        try:
+            self.blend_map['mul'] = SDL_BLENDMODE_MUL
+        except NameError:
+            self.blend_map['mul'] = 0x00000008
         self.r_blend_map = {b: a for a, b in self.blend_map.items()}
         self.event_map = {
             SDL_AUDIODEVICEADDED: lambda: self.on_audio_device_add(AudioDeviceEvent(self.sdl_event.adevice)),
