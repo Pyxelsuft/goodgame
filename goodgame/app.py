@@ -82,8 +82,6 @@ class App:
             SDL_APP_DIDENTERBACKGROUND: lambda: self.on_did_enter_background(CommonEvent(self.sdl_event.common)),
             SDL_APP_WILLENTERFOREGROUND: lambda: self.on_will_enter_foreground(CommonEvent(self.sdl_event.common)),
             SDL_APP_DIDENTERFOREGROUND: lambda: self.on_did_enter_foreground(CommonEvent(self.sdl_event.common)),
-            SDL_LOCALECHANGED: lambda: self.on_locale_change(CommonEvent(self.sdl_event.common)),
-            SDL_KEYMAPCHANGED: lambda: self.on_keymap_change(CommonEvent(self.sdl_event.common)),
             SDL_RENDER_TARGETS_RESET: lambda: self.on_render_targets_reset(CommonEvent(self.sdl_event.common)),
             SDL_RENDER_DEVICE_RESET: lambda: self.on_render_device_reset(CommonEvent(self.sdl_event.common))
         }
@@ -99,6 +97,14 @@ class App:
             self.event_map[SDL_DISPLAYEVENT] = lambda: self.on_display_event(DisplayEvent(self.sdl_event.display, self))
         except NameError:
             self.event_map[0x150] = lambda: self.on_display_event(DisplayEvent(self.sdl_event.display, self))
+        try:
+            self.event_map[SDL_LOCALECHANGED] = lambda: self.on_locale_change(CommonEvent(self.sdl_event.common))
+        except NameError:
+            self.event_map[0x107] = lambda: self.on_locale_change(CommonEvent(self.sdl_event.common))
+        try:
+            self.event_map[SDL_KEYMAPCHANGED] = lambda: self.on_keymap_change(CommonEvent(self.sdl_event.common))
+        except NameError:
+            self.event_map[0x304] = lambda: self.on_keymap_change(CommonEvent(self.sdl_event.common))
         self.windows = {}
         self.running = False
         self.rel_mouse_mode = False
