@@ -75,7 +75,6 @@ class App:
             SDL_MOUSEBUTTONUP: lambda: self.on_mouse_up(MouseButtonEvent(self.sdl_event.button, self)),
             SDL_MOUSEWHEEL: lambda: self.on_mouse_wheel(MouseWheelEvent(self.sdl_event.wheel, self)),
             SDL_TEXTINPUT: lambda: self.on_text_input(TextInputEvent(self.sdl_event.text, self)),
-            SDL_DISPLAYEVENT: lambda: self.on_display_event(DisplayEvent(self.sdl_event.display, self)),
             SDL_WINDOWEVENT: lambda: self.on_window_event(WindowEvent(self.sdl_event.window, self)),
             SDL_APP_TERMINATING: lambda: self.on_terminate(CommonEvent(self.sdl_event.common)),
             SDL_APP_LOWMEMORY: lambda: self.on_low_memory(CommonEvent(self.sdl_event.common)),
@@ -96,6 +95,10 @@ class App:
             self.event_map[0x305] = lambda: self.on_text_edit_ext(
                 TextEditingEvent(self.sdl_event.edit, self)
             )
+        try:
+            self.event_map[SDL_DISPLAYEVENT] = lambda: self.on_display_event(DisplayEvent(self.sdl_event.display, self))
+        except NameError:
+            self.event_map[0x150] = lambda: self.on_display_event(DisplayEvent(self.sdl_event.display, self))
         self.windows = {}
         self.running = False
         self.rel_mouse_mode = False
