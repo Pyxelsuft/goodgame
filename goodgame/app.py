@@ -70,7 +70,6 @@ class App:
             SDL_KEYDOWN: lambda: self.on_key_down(KeyboardEvent(self.sdl_event.key, self)),
             SDL_KEYUP: lambda: self.on_key_up(KeyboardEvent(self.sdl_event.key, self)),
             SDL_TEXTEDITING: lambda: self.on_text_edit(TextEditingEvent(self.sdl_event.edit, self)),
-            SDL_TEXTEDITING_EXT: lambda: self.on_text_edit_ext(TextEditingEvent(self.sdl_event.edit, self)),
             SDL_MOUSEMOTION: lambda: self.on_mouse_move(MouseMotionEvent(self.sdl_event.motion, self)),
             SDL_MOUSEBUTTONDOWN: lambda: self.on_mouse_down(MouseButtonEvent(self.sdl_event.button, self)),
             SDL_MOUSEBUTTONUP: lambda: self.on_mouse_up(MouseButtonEvent(self.sdl_event.button, self)),
@@ -89,6 +88,14 @@ class App:
             SDL_RENDER_TARGETS_RESET: lambda: self.on_render_targets_reset(CommonEvent(self.sdl_event.common)),
             SDL_RENDER_DEVICE_RESET: lambda: self.on_render_device_reset(CommonEvent(self.sdl_event.common))
         }
+        try:
+            self.event_map[SDL_TEXTEDITING_EXT] = lambda: self.on_text_edit_ext(
+                TextEditingEvent(self.sdl_event.edit, self)
+            )
+        except NameError:
+            self.event_map[0x305] = lambda: self.on_text_edit_ext(
+                TextEditingEvent(self.sdl_event.edit, self)
+            )
         self.windows = {}
         self.running = False
         self.rel_mouse_mode = False
