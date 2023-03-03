@@ -37,7 +37,7 @@ version = 0.1
 
 # (list) Application requirements
 # comma separated e.g. requirements = sqlite3,kivy
-requirements = python3,pysdl2
+requirements = python3,pysdl2,Pillow
 
 # (str) Custom source folders for requirements
 # Sets custom source for any requirements with recipes
@@ -122,7 +122,7 @@ android.permissions = android.persimmison.READ_EXTERNAL_STORAGE, android.permiss
 #android.ndk_path =
 
 # (str) Android SDK directory (if empty, it will be automatically downloaded.)
-#android.sdk_path =
+android.sdk_path = .buildozer/android/platform/android-sdk
 
 # (str) ANT directory (if empty, it will be automatically downloaded.)
 #android.ant_path =
