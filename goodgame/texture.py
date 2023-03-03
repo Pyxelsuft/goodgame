@@ -62,8 +62,12 @@ class Texture:
         self.set_blend_mode_int(self.app.blend_map[blend_mode])
 
     def get_blend_mode_int(self) -> int:
-        blend_mode_ptr = ctypes.c_long()
-        SDL_GetTextureBlendMode(self.texture, blend_mode_ptr)
+        try:
+            blend_mode_ptr = ctypes.c_long()
+            SDL_GetTextureBlendMode(self.texture, blend_mode_ptr)
+        except ctypes.ArgumentError:
+            blend_mode_ptr = ctypes.c_int()
+            SDL_GetTextureBlendMode(self.texture, blend_mode_ptr)
         return blend_mode_ptr.value
 
     def set_blend_mode_int(self, blend_mode: int) -> None:

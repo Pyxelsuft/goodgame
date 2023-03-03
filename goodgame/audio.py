@@ -138,24 +138,24 @@ class AudioDeviceManager:
         name_ptr = ctypes.c_char_p()
         spec = SDL_AudioSpec(0, 0, 0, 0)
         SDL_GetDefaultAudioInfo(name_ptr, spec, 0)
-        return AudioSpec(spec, False, self.app.bts(name_ptr.value))
+        return AudioSpec(spec, False, self.app.bts(name_ptr.value or b''))
 
     def get_default_recording_info(self) -> AudioSpec:
         name_ptr = ctypes.c_char_p()
         spec = SDL_AudioSpec(0, 0, 0, 0)
         SDL_GetDefaultAudioInfo(name_ptr, spec, 1)
-        return AudioSpec(spec, True, self.app.bts(name_ptr.value))
+        return AudioSpec(spec, True, self.app.bts(name_ptr.value or b''))
 
     def get_playback_devices(self) -> None:
         for i in range(SDL_GetNumAudioDevices(0)):
-            device_name = self.app.bts(SDL_GetAudioDeviceName(i, 0))
+            device_name = self.app.bts(SDL_GetAudioDeviceName(i, 0) or b'')
             spec_ptr = SDL_AudioSpec(0, 0, 0, 0)
             SDL_GetAudioDeviceSpec(i, 0, spec_ptr)
             self.playback_devices.append(AudioSpec(spec_ptr, False, device_name))
 
     def get_recording_devices(self) -> None:
         for i in range(SDL_GetNumAudioDevices(1)):
-            device_name = self.app.bts(SDL_GetAudioDeviceName(i, 1))
+            device_name = self.app.bts(SDL_GetAudioDeviceName(i, 1) or b'')
             spec_ptr = SDL_AudioSpec(0, 0, 0, 0)
             SDL_GetAudioDeviceSpec(i, 1, spec_ptr)
             self.playback_devices.append(AudioSpec(spec_ptr, True, device_name))

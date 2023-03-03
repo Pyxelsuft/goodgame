@@ -40,8 +40,12 @@ class Surface:
         self.set_blend_mode_int(self.app.blend_map[blend_mode])
 
     def get_blend_mode_int(self) -> int:
-        blend_mode_ptr = ctypes.c_long()
-        SDL_GetSurfaceBlendMode(self.surface, blend_mode_ptr)
+        try:
+            blend_mode_ptr = ctypes.c_long()
+            SDL_GetSurfaceBlendMode(self.surface, blend_mode_ptr)
+        except ctypes.ArgumentError:
+            blend_mode_ptr = ctypes.c_int()
+            SDL_GetSurfaceBlendMode(self.surface, blend_mode_ptr)
         return blend_mode_ptr.value
 
     def set_blend_mode_int(self, blend_mode: int) -> None:
@@ -80,8 +84,12 @@ class Surface:
         self.update_blend_mode_by_alpha()
 
     def get_alpha_mod(self) -> int:
-        alpha_mod_ptr = ctypes.c_ulong()
-        SDL_GetColorKey(self.surface, alpha_mod_ptr)
+        try:
+            alpha_mod_ptr = ctypes.c_ulong()
+            SDL_GetColorKey(self.surface, alpha_mod_ptr)
+        except ctypes.ArgumentError:
+            alpha_mod_ptr = ctypes.c_uint()
+            SDL_GetColorKey(self.surface, alpha_mod_ptr)
         return alpha_mod_ptr.value
 
     def set_color_key(self, enabled: bool, color_key: int = 0) -> None:
@@ -91,8 +99,12 @@ class Surface:
         self.has_color_key = SDL_HasColorKey(self.surface)
 
     def get_color_key(self) -> int:
-        key_ptr = ctypes.c_ulong()
-        SDL_GetColorKey(self.surface, key_ptr)
+        try:
+            key_ptr = ctypes.c_ulong()
+            SDL_GetColorKey(self.surface, key_ptr)
+        except ctypes.ArgumentError:
+            key_ptr = ctypes.c_uint()
+            SDL_GetColorKey(self.surface, key_ptr)
         return key_ptr.value
 
     def set_color_mod(self, color_mod: any) -> None:
