@@ -94,6 +94,7 @@ class App:
         self.sdl_event = SDL_Event()
         self.destroyed = False
         # TODO:
+        #  async sprites loader
         #  math
         #  RW ops
         #  gifs (animations) loading
