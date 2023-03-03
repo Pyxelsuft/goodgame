@@ -22,7 +22,6 @@ try:
 except Exception as _err:
     print(f'Failed to import SDL2_ttf [{_err}]. Font loading and rendering will be disabled!')
 
-
 try:
     SDL_TEXTEDITING_EXT = SDL_TEXTEDITING_EXT
 except NameError:
@@ -47,6 +46,10 @@ try:
     IMG_INIT_JXL = IMG_INIT_JXL
 except NameError:
     IMG_INIT_JXL = 0x00000010
+try:
+    IMG_INIT_AVIF = IMG_INIT_AVIF
+except NameError:
+    IMG_INIT_AVIF = 0x00000020
 
 
 class App:
