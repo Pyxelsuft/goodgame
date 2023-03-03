@@ -116,8 +116,12 @@ class AudioDeviceManager:
         self.current_driver = app.bts(SDL_GetCurrentAudioDriver())
         self.playback_devices = []
         self.recording_devices = []
-        self.default_playback_info = self.get_default_playback_info()
-        self.default_recording_info = self.get_default_recording_info()
+        try:
+            self.default_playback_info = self.get_default_playback_info()
+            self.default_recording_info = self.get_default_recording_info()
+        except RuntimeError:
+            self.default_playback_info = AudioSpec(is_capture=False)
+            self.default_recording_info = AudioSpec(is_capture=True)
         self.get_playback_devices()
         self.get_recording_devices()
 
