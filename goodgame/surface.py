@@ -187,8 +187,8 @@ class Surface:
         if IMG_SavePNG(self.surface, self.app.stb(path)) < 0:
             self.app.raise_error(IMG_GetError)
 
-    def save_to_jpg(self, path: str) -> None:
-        if IMG_SaveJPG(self.surface, self.app.stb(path)) < 0:
+    def save_to_jpg(self, path: str, quality: float = 1.0) -> None:
+        if IMG_SaveJPG(self.surface, self.app.stb(path), int(quality * 100)) < 0:
             self.app.raise_error(IMG_GetError)
 
     def __del__(self) -> None:
