@@ -2,7 +2,8 @@ import os
 import ctypes
 from .exceptions import FlagNotFoundError, SDLError
 from .events import CommonEvent, QuitEvent, AudioDeviceEvent, DropEvent, TouchFingerEvent, KeyboardEvent,\
-    MouseMotionEvent, MouseButtonEvent, MouseWheelEvent, TextEditingEvent, TextInputEvent, DisplayEvent, WindowEvent
+    MouseMotionEvent, MouseButtonEvent, MouseWheelEvent, TextEditingEvent, TextInputEvent, DisplayEvent, WindowEvent,\
+    JoyAxisEvent, JoyBallEvent, JoyButtonEvent, JoyDeviceEvent, JoyHatEvent
 from .sdl import SDLVersion, sdl_dir
 from .surface import Surface, SurfaceAnimation
 from .video import PixelFormat
@@ -131,7 +132,14 @@ class App:
             SDL_DISPLAYEVENT: lambda: self.on_display_event(DisplayEvent(self.sdl_event.display, self)),
             SDL_LOCALECHANGED: lambda: self.on_locale_change(CommonEvent(self.sdl_event.common)),
             SDL_KEYMAPCHANGED: lambda: self.on_keymap_change(CommonEvent(self.sdl_event.common)),
-            SDL_CLIPBOARDUPDATE: lambda: self.on_clipboard_update(CommonEvent(self.sdl_event.common))
+            SDL_CLIPBOARDUPDATE: lambda: self.on_clipboard_update(CommonEvent(self.sdl_event.common)),
+            SDL_JOYAXISMOTION: lambda: self.on_joy_axis_motion(JoyAxisEvent(self.sdl_event.jaxis)),
+            SDL_JOYBALLMOTION: lambda: self.on_joy_ball_motion(JoyBallEvent(self.sdl_event.jball)),
+            SDL_JOYBUTTONDOWN: lambda: self.on_joy_button_down(JoyButtonEvent(self.sdl_event.jbutton)),
+            SDL_JOYBUTTONUP: lambda: self.on_joy_button_up(JoyButtonEvent(self.sdl_event.jbutton)),
+            SDL_JOYDEVICEADDED: lambda: self.on_joy_device_added(JoyDeviceEvent(self.sdl_event.jdevice)),
+            SDL_JOYDEVICEREMOVED: lambda: self.on_joy_device_removed(JoyDeviceEvent(self.sdl_event.jdevice)),
+            SDL_JOYHATMOTION: lambda: self.on_joy_hat_motion(JoyHatEvent(self.sdl_event.jhat))
         }
         self.windows = {}
         self.running = False
@@ -142,7 +150,6 @@ class App:
         self.sdl_event = SDL_Event()
         self.destroyed = False
         # TODO:
-        #  joystick events
         #  RW ops (do we need them?)
         #  hidapi (do we need it?), joysticks, haptics, sensors, gestures (do we need them?)
         #  pixels (palettes, etc)
@@ -630,6 +637,27 @@ class App:
         pass
 
     def on_render_device_reset(self, event: CommonEvent) -> None:
+        pass
+
+    def on_joy_axis_motion(self, event: JoyAxisEvent) -> None:
+        pass
+
+    def on_joy_ball_motion(self, event: JoyBallEvent) -> None:
+        pass
+
+    def on_joy_button_down(self, event: JoyButtonEvent) -> None:
+        pass
+
+    def on_joy_button_up(self, event: JoyButtonEvent) -> None:
+        pass
+
+    def on_joy_device_added(self, event: JoyDeviceEvent) -> None:
+        pass
+
+    def on_joy_device_removed(self, event: JoyDeviceEvent) -> None:
+        pass
+
+    def on_joy_hat_motion(self, event: JoyHatEvent) -> None:
         pass
 
     def __del__(self) -> None:

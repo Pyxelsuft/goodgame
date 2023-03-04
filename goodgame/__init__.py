@@ -2,7 +2,8 @@ from .exceptions import FlagNotFoundError, SDLError
 from .app import App
 from .clock import Clock, Timer, Animation
 from .events import CommonEvent, QuitEvent, AudioDeviceEvent, DropEvent, TouchFingerEvent, KeyboardEvent,\
-    MouseMotionEvent, MouseButtonEvent, MouseWheelEvent, TextEditingEvent, TextInputEvent, DisplayEvent, WindowEvent
+    MouseMotionEvent, MouseButtonEvent, MouseWheelEvent, TextEditingEvent, TextInputEvent, DisplayEvent, WindowEvent,\
+    JoyAxisEvent, JoyBallEvent, JoyButtonEvent, JoyDeviceEvent, JoyHatEvent
 from .audio import AudioDeviceManager, AudioSpec, AudioDevice
 from .video import BackendManager, Backend, DisplaysManager, Display, DisplayMode, PixelFormat
 from .window import Window

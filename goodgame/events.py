@@ -20,6 +20,57 @@ class QuitEvent(CommonEvent):
     pass
 
 
+class JoyAxisEvent(CommonEvent):
+    def __init__(self, event: SDL_Event) -> None:
+        super().__init__(event)
+        self.instance_id = event.which
+        self.axis = event.axis
+        self.value = event.value
+
+
+class JoyBallEvent(CommonEvent):
+    def __init__(self, event: SDL_Event) -> None:
+        super().__init__(event)
+        self.instance_id = event.which
+        self.ball = event.ball
+        self.rel = (event.xrel, event.yrel)
+
+
+class JoyButtonEvent(CommonEvent):
+    def __init__(self, event: SDL_Event) -> None:
+        super().__init__(event)
+        self.instance_id = event.which
+        self.button = event.button
+        self.state = 'pressed' if event.state == SDL_PRESSED else 'released'
+
+
+class JoyDeviceEvent(CommonEvent):
+    def __init__(self, event: SDL_Event) -> None:
+        super().__init__(event)
+        if self.type == SDL_JOYDEVICEADDED:
+            self.index = event.which
+            self.instance_id = 0
+        else:
+            self.index = 0
+            self.instance_id = event.which
+
+
+class JoyHatEvent(CommonEvent):
+    def __init__(self, event: SDL_Event) -> None:
+        super().__init__(event)
+        self.instance_id = event.which
+        self.hat = event.hat
+        self.state = {
+            SDL_JOYSTICK_POWER_UNKNOWN: 'unknown',
+            SDL_JOYSTICK_POWER_EMPTY: 'empty',
+            SDL_JOYSTICK_POWER_LOW: 'low',
+            SDL_JOYSTICK_POWER_MEDIUM: 'medium',
+            SDL_JOYSTICK_POWER_FULL: 'full',
+            SDL_JOYSTICK_POWER_WIRED: 'wired',
+            SDL_JOYSTICK_POWER_MAX: 'max'
+        }.get(event.value)
+
+
 class AudioDeviceEvent(CommonEvent):
     def __init__(self, event: SDL_Event) -> None:
         super().__init__(event)
