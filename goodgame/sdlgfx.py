@@ -1,4 +1,5 @@
 import math
+import ctypes
 from sdl2 import *
 
 
@@ -704,3 +705,81 @@ def filledPieRGBA(
         renderer: SDL_Renderer, x: int, y: int, rad: int, start: int, end: int, r: int, g: int, b: int, a: int
 ) -> int:
     return _pieRGBA(renderer, x, y, rad, start, end, r, g, b, a, 1)
+
+
+def trigonRGBA(
+        renderer: SDL_Renderer, x1: int, y1: int, x2: int, y2: int, x3: int, y3: int, r: int, g: int, b: int, a: int
+) -> int:
+    return polygonRGBA(renderer, (ctypes.c_int16 * 3)(x1, x2, x3), (ctypes.c_int16 * 3)(y1, y2, y3), 3, r, g, b, a)
+
+
+def aatrigonRGBA(
+        renderer: SDL_Renderer, x1: int, y1: int, x2: int, y2: int, x3: int, y3: int, r: int, g: int, b: int, a: int
+) -> int:
+    return aapolygonRGBA(renderer, (ctypes.c_int16 * 3)(x1, x2, x3), (ctypes.c_int16 * 3)(y1, y2, y3), 3, r, g, b, a)
+
+
+def filledTrigonRGBA(
+        renderer: SDL_Renderer, x1: int, y1: int, x2: int, y2: int, x3: int, y3: int, r: int, g: int, b: int, a: int
+) -> int:
+    return filledPolygonRGBA(renderer, (ctypes.c_int16 * 3)(x1, x2, x3), (ctypes.c_int16 * 3)(y1, y2, y3), 3, r, g, b, a)
+
+
+def polygon(renderer: SDL_Renderer, vx: any, vy: any, n: int) -> int:
+    # TODO
+    return -1
+
+
+def polygonRGBA(renderer: SDL_Renderer, vx: any, vy: any, n: int, r: int, g: int, b: int, a: int) -> int:
+    # TODO
+    return -1
+
+
+def aapolygonRGBA(renderer: SDL_Renderer, vx: any, vy: any, n: int, r: int, g: int, b: int, a: int) -> int:
+    # TODO
+    return -1
+
+
+def filledPolygonRGBAMT(
+        renderer: SDL_Renderer, vx: any, vy: any, n: int,
+        r: int, g: int, b: int, a: int, polyInts: any, polyAllocated: any
+) -> int:
+    # TODO
+    return -1
+
+
+def filledPolygonRGBA(renderer: SDL_Renderer, vx: any, vy: any, n: int, r: int, g: int, b: int, a: int) -> int:
+    return filledPolygonRGBAMT(renderer, vx, vy, n, r, g, b, a, None, None)
+
+
+def _evaluateBezier(data: any, ndata: int, t: float) -> int:
+    # TODO
+    return -1
+
+
+def bezierRGBA(renderer: SDL_Renderer, vx: any, vy: any, n: int, s: int, r: int, g: int, b: int, a: int) -> int:
+    # TODO
+    return -1
+
+
+def thickLineRGBA(
+        renderer: SDL_Renderer, x1: int, y1: int, x2: int, y2: int, width: int, r: int, g: int, b: int, a: int
+) -> int:
+    if not renderer or width < 1:
+        return -1
+    if x1 == x2 and y1 == y2:
+        wh = width // 2
+        return boxRGBA(renderer, x1 - wh, y1 - wh, x2 + width, y2 + width, r, g, b, a)
+    if width == 1:
+        return lineRGBA(renderer, x1, y1, x2, y2, r, g, b, a)
+    dx = x2 - x1
+    dy = y2 - y1
+    _l = math.sqrt(dx * dx + dy * dy)
+    ang = math.atan2(dx, dy)
+    adj = 0.1 + 0.9 * abs(math.cos(2.0 * ang))
+    wl2 = (width - adj) / (2.0 * _l)
+    nx = dx * wl2
+    ny = dy * wl2
+    return filledPolygonRGBA(
+        renderer, [x1 + ny, x1 - ny, x2 - ny, x2 + ny], [y1 - nx, y1 + nx, y2 + nx, y2 - nx], 4, r, g, b, a
+    )
