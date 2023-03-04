@@ -20,7 +20,7 @@ class App(gg.App):
         if self.running and self.clock.tick():
             self.window.renderer.update()
 
-    def on_quit(self, event: gg.QuitEvent) -> None:
+    def on_quit(self, event: gg.QuitEvent = None) -> None:
         super().on_quit(event)
         self.stop_loop()
         self.window.renderer.fps_font.destroy()
@@ -47,6 +47,8 @@ class Window(gg.Window):
     def on_key_down(self, event: gg.KeyboardEvent) -> None:
         if event.sym == '1':
             self.renderer.set_vsync(not self.renderer.vsync)
+        elif event.sym == 'Escape':
+            self.app.on_quit()
 
 
 class Renderer(gg.Renderer):
