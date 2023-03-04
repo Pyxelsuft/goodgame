@@ -40,6 +40,10 @@ try:
 except NameError:
     SDL_KEYMAPCHANGED = 0x304
 try:
+    SDL_CLIPBOARDUPDATE = SDL_CLIPBOARDUPDATE
+except NameError:
+    SDL_CLIPBOARDUPDATE = 0x900
+try:
     SDL_INIT_SENSOR = SDL_INIT_SENSOR
 except NameError:
     SDL_INIT_SENSOR = 0x00008000
@@ -125,7 +129,8 @@ class App:
             SDL_TEXTEDITING_EXT: lambda: self.on_text_edit_ext(TextEditingEvent(self.sdl_event.edit, self)),
             SDL_DISPLAYEVENT: lambda: self.on_display_event(DisplayEvent(self.sdl_event.display, self)),
             SDL_LOCALECHANGED: lambda: self.on_locale_change(CommonEvent(self.sdl_event.common)),
-            SDL_KEYMAPCHANGED: lambda: self.on_keymap_change(CommonEvent(self.sdl_event.common))
+            SDL_KEYMAPCHANGED: lambda: self.on_keymap_change(CommonEvent(self.sdl_event.common)),
+            SDL_CLIPBOARDUPDATE: lambda: self.on_clipboard_update(CommonEvent(self.sdl_event.common))
         }
         # TODO: SDL_CLIPBOARDUPDATE
         self.windows = {}
@@ -138,7 +143,7 @@ class App:
         self.destroyed = False
         # TODO:
         #  RW ops (do we need them?)
-        #  hidapi (do we need it?), joysticks, haptics, sensors, gestures
+        #  hidapi (do we need it?), joysticks, haptics, sensors, gestures (do we need them?)
         #  pixels (palettes, etc)
         #  Custom message box
 
@@ -612,6 +617,9 @@ class App:
         pass
 
     def on_keymap_change(self, event: CommonEvent) -> None:
+        pass
+
+    def on_clipboard_update(self, event: CommonEvent) -> None:
         pass
 
     def on_render_targets_reset(self, event: CommonEvent) -> None:
