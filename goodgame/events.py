@@ -6,7 +6,7 @@ try:
 except NameError:
     SDL_TOUCH_MOUSEID = 2 ** 32 - 1
 
-default_window_id = 0
+default_window_id = [0]
 
 
 class CommonEvent:
@@ -46,7 +46,7 @@ class DropEvent(CommonEvent):
             self.file = None
             self.drop_type = None
             self.drop_state = 'begin' if self.type == SDL_DROPBEGIN else 'complete'
-        self.window_id = event.windowID if hasattr(event, 'windowID') else default_window_id
+        self.window_id = event.windowID if hasattr(event, 'windowID') else default_window_id[0]
         self.window = app.windows[self.window_id]
 
 
@@ -62,7 +62,7 @@ class TouchFingerEvent(CommonEvent):
         self.pos = (event.x, event.y)
         self.d_pos = (event.dx, event.dy)
         self.pressure = event.pressure
-        self.window_id = event.windowID if hasattr(event, 'windowID') else default_window_id
+        self.window_id = event.windowID if hasattr(event, 'windowID') else default_window_id[0]
         self.window = app.windows[self.window_id]
 
 
@@ -79,7 +79,7 @@ class KeyboardEvent(CommonEvent):
         self.sym_id = event.keysym.sym
         self.sym = app.bts(SDL_GetKeyName(self.sym_id))
         self.mod = event.keysym.mod
-        self.window_id = event.windowID if hasattr(event, 'windowID') else default_window_id
+        self.window_id = event.windowID if hasattr(event, 'windowID') else default_window_id[0]
         self.window = app.windows[self.window_id]
 
 
@@ -98,7 +98,7 @@ class MouseMotionEvent(CommonEvent):
         )
         self.pos = (event.x, event.y)
         self.rel = (event.xrel, event.yrel)
-        self.window_id = event.windowID if hasattr(event, 'windowID') else default_window_id
+        self.window_id = event.windowID if hasattr(event, 'windowID') else default_window_id[0]
         self.window = app.windows[self.window_id]
 
 
@@ -119,7 +119,7 @@ class MouseButtonEvent(CommonEvent):
         self.state = 'pressed' if event.state == SDL_PRESSED else 'released'
         self.clicks = event.clicks
         self.pos = (event.x, event.y)
-        self.window_id = event.windowID if hasattr(event, 'windowID') else default_window_id
+        self.window_id = event.windowID if hasattr(event, 'windowID') else default_window_id[0]
         self.window = app.windows[self.window_id]
 
 
@@ -132,7 +132,7 @@ class MouseWheelEvent(CommonEvent):
         self.direction = 'flipped' if event.direction == SDL_MOUSEWHEEL_FLIPPED else 'normal'
         self.precise_x = event.preciseX
         self.precise_y = event.preciseY
-        self.window_id = event.windowID if hasattr(event, 'windowID') else default_window_id
+        self.window_id = event.windowID if hasattr(event, 'windowID') else default_window_id[0]
         self.window = app.windows[self.window_id]
 
 
@@ -142,7 +142,7 @@ class TextEditingEvent(CommonEvent):
         self.text = app.bts(event.text, 'utf-8')
         self.start = event.start
         self.length = event.length
-        self.window_id = event.windowID if hasattr(event, 'windowID') else default_window_id
+        self.window_id = event.windowID if hasattr(event, 'windowID') else default_window_id[0]
         self.window = app.windows[self.window_id]
 
 
@@ -150,7 +150,7 @@ class TextInputEvent(CommonEvent):
     def __init__(self, event: SDL_Event, app: any) -> None:
         super().__init__(event)
         self.text = app.bts(event.text, 'utf-8')
-        self.window_id = event.windowID if hasattr(event, 'windowID') else default_window_id
+        self.window_id = event.windowID if hasattr(event, 'windowID') else default_window_id[0]
         self.window = app.windows[self.window_id]
 
 
@@ -178,5 +178,5 @@ class WindowEvent(CommonEvent):
         self.padding1 = event.padding1
         self.padding2 = event.padding2
         self.padding3 = event.padding3
-        self.window_id = event.windowID if hasattr(event, 'windowID') else default_window_id
+        self.window_id = event.windowID if hasattr(event, 'windowID') else default_window_id[0]
         self.window = app.windows[self.window_id]
