@@ -2,6 +2,7 @@ import ctypes
 from .video import Backend, BackendManager
 from .surface import Surface
 from .texture import Texture
+from .sdl import sdl_dir
 from sdl2 import *
 
 try:
@@ -20,7 +21,8 @@ class Renderer:
             self,
             window: any,
             backend: Backend = None,
-            vsync: bool = False
+            vsync: bool = False,
+            force_int: bool = False
     ) -> None:
         self.destroyed = True
         self.app = window.app
@@ -28,6 +30,17 @@ class Renderer:
         self.backend = backend or BackendManager(self.app).get_best()
         self.vsync = vsync
         self.texture = None
+        if force_int or 'SDL_RenderCopyF' not in sdl_dir:
+            self.blit = self.blit_i
+            self.blit_ex = self.blit_ex_i
+            self.draw_point = self.draw_point_i
+            self.draw_points = self.draw_points_i
+            self.sdl_draw_rect = self.sdl_draw_rect_i
+            self.sdl_draw_rects = self.sdl_draw_rects_i
+            self.sdl_fill_rect = self.sdl_fill_rect_i
+            self.sdl_fill_rects = self.sdl_fill_rects_i
+            self.sdl_draw_line = self.sdl_draw_line_i
+            self.sdl_draw_lines = self.sdl_draw_lines_i
         self.renderer = SDL_CreateRenderer(
             window.window,
             self.backend.backend_id,
@@ -110,6 +123,16 @@ class Renderer:
                           SDL_FRect(dst_rect[0], dst_rect[1], texture.get_w(), texture.get_h()))
         )
 
+    def blit_i(self, texture: Texture, src_rect: any = None, dst_rect: any = None) -> None:
+        SDL_RenderCopy(
+            self.renderer,
+            texture.texture,
+            src_rect and SDL_Rect(int(src_rect[0]), int(src_rect[1]), int(src_rect[2]), int(src_rect[3])),
+            dst_rect and (SDL_Rect(int(dst_rect[0]), int(dst_rect[1]), int(dst_rect[2]), int(dst_rect[3]))
+                          if len(dst_rect) > 2 else
+                          SDL_Rect(int(dst_rect[0]), int(dst_rect[1]), texture.get_w(), texture.get_h()))
+        )
+
     def blit_ex(
             self, texture: Texture, src_rect: any = None, dst_rect: any = None, angle: float = 0.0,
             center: any = None, flip_horizontal: bool = False, flip_vertical: bool = False
@@ -120,6 +143,22 @@ class Renderer:
             src_rect and SDL_FRect(src_rect[0], src_rect[1], src_rect[2], src_rect[3]),
             dst_rect and (SDL_FRect(dst_rect[0], dst_rect[1], dst_rect[2], dst_rect[3]) if len(dst_rect) > 2 else
                           SDL_FRect(dst_rect[0], dst_rect[1], texture.get_w(), texture.get_h())),
+            angle,
+            center and SDL_FPoint(center[0], center[1]),
+            ((flip_horizontal and SDL_FLIP_HORIZONTAL) | (flip_vertical and SDL_FLIP_VERTICAL)) or SDL_FLIP_NONE
+        )
+
+    def blit_ex_i(
+            self, texture: Texture, src_rect: any = None, dst_rect: any = None, angle: float = 0.0,
+            center: any = None, flip_horizontal: bool = False, flip_vertical: bool = False
+    ) -> None:
+        SDL_RenderCopyEx(
+            self.renderer,
+            texture.texture,
+            src_rect and SDL_Rect(int(src_rect[0]), int(src_rect[1]), int(src_rect[2]), int(src_rect[3])),
+            dst_rect and (SDL_Rect(int(dst_rect[0]), int(dst_rect[1]), int(dst_rect[2]), int(dst_rect[3]))
+                          if len(dst_rect) > 2 else
+                          SDL_Rect(int(dst_rect[0]), int(dst_rect[1]), texture.get_w(), texture.get_h())),
             angle,
             center and SDL_FPoint(center[0], center[1]),
             ((flip_horizontal and SDL_FLIP_HORIZONTAL) | (flip_vertical and SDL_FLIP_VERTICAL)) or SDL_FLIP_NONE
@@ -282,11 +321,23 @@ class Renderer:
         self.set_draw_color(color)
         SDL_RenderDrawPointF(self.renderer, point[0], point[1])
 
+    def draw_point_i(self, color: any, point: any) -> None:
+        self.set_draw_color(color)
+        SDL_RenderDrawPoint(self.renderer, int(point[0]), int(point[1]))
+
     def draw_points(self, color: any, points: any) -> None:
         self.set_draw_color(color)
         SDL_RenderDrawPointsF(
             self.renderer,
             (SDL_FPoint * len(points))(*(SDL_FPoint(point[0], point[1]) for point in points)),
+            len(points)
+        )
+
+    def draw_points_i(self, color: any, points: any) -> None:
+        self.set_draw_color(color)
+        SDL_RenderDrawPoints(
+            self.renderer,
+            (SDL_Point * len(points))(*(SDL_Point(int(point[0]), int(point[1])) for point in points)),
             len(points)
         )
 
@@ -321,12 +372,28 @@ class Renderer:
             draw_rect and SDL_FRect(draw_rect[0], draw_rect[1], draw_rect[2], draw_rect[3])
         )
 
+    def sdl_draw_rect_i(self, color: any, draw_rect: any = None) -> None:
+        self.set_draw_color(color)
+        SDL_RenderDrawRect(
+            self.renderer,
+            draw_rect and SDL_Rect(int(draw_rect[0]), int(draw_rect[1]), int(draw_rect[2]), int(draw_rect[3]))
+        )
+
     def sdl_draw_rects(self, color: any, draw_rects: any) -> None:
         self.set_draw_color(color)
         SDL_RenderDrawRectsF(
             self.renderer,
             (SDL_FRect * len(draw_rects))(*(draw_rect and SDL_FRect(
                 draw_rect[0], draw_rect[1], draw_rect[2], draw_rect[3]) for draw_rect in draw_rects)),
+            len(draw_rects)
+        )
+
+    def sdl_draw_rects_i(self, color: any, draw_rects: any) -> None:
+        self.set_draw_color(color)
+        SDL_RenderDrawRects(
+            self.renderer,
+            (SDL_Rect * len(draw_rects))(*(draw_rect and SDL_Rect(int(
+                draw_rect[0]), int(draw_rect[1]), int(draw_rect[2]), int(draw_rect[3])) for draw_rect in draw_rects)),
             len(draw_rects)
         )
 
@@ -337,12 +404,28 @@ class Renderer:
             fill_rect and SDL_FRect(fill_rect[0], fill_rect[1], fill_rect[2], fill_rect[3])
         )
 
+    def sdl_fill_rect_i(self, color: any, fill_rect: any = None) -> None:
+        self.set_draw_color(color)
+        SDL_RenderFillRect(
+            self.renderer,
+            fill_rect and SDL_Rect(int(fill_rect[0]), int(fill_rect[1]), int(fill_rect[2]), int(fill_rect[3]))
+        )
+
     def sdl_fill_rects(self, color: any, fill_rects: any) -> None:
         self.set_draw_color(color)
         SDL_RenderFillRectsF(
             self.renderer,
             (SDL_FRect * len(fill_rects))(*(fill_rect and SDL_FRect(
                 fill_rect[0], fill_rect[1], fill_rect[2], fill_rect[3]) for fill_rect in fill_rects)),
+            len(fill_rects)
+        )
+
+    def sdl_fill_rects_i(self, color: any, fill_rects: any) -> None:
+        self.set_draw_color(color)
+        SDL_RenderFillRects(
+            self.renderer,
+            (SDL_Rect * len(fill_rects))(*(fill_rect and SDL_Rect(int(
+                fill_rect[0]), int(fill_rect[1]), int(fill_rect[2]), int(fill_rect[3])) for fill_rect in fill_rects)),
             len(fill_rects)
         )
 
@@ -364,11 +447,23 @@ class Renderer:
         self.set_draw_color(color)
         SDL_RenderDrawLineF(self.renderer, start[0], start[1], end[0], end[1])
 
+    def sdl_draw_line_i(self, color: any, start: any, end: any) -> None:
+        self.set_draw_color(color)
+        SDL_RenderDrawLine(self.renderer, int(start[0]), int(start[1]), int(end[0]), int(end[1]))
+
     def sdl_draw_lines(self, color: any, points: any) -> None:
         self.set_draw_color(color)
         SDL_RenderDrawLinesF(
             self.renderer,
             (SDL_FPoint * len(points))(*(SDL_FPoint(point[0], point[1]) for point in points)),
+            len(points)
+        )
+
+    def sdl_draw_lines_i(self, color: any, points: any) -> None:
+        self.set_draw_color(color)
+        SDL_RenderDrawLines(
+            self.renderer,
+            (SDL_Point * len(points))(*(SDL_Point(int(point[0]), int(point[1])) for point in points)),
             len(points)
         )
 
