@@ -26,9 +26,9 @@ class Surface:
         self.color_key = self.get_color_key()
         self.alpha_mod = self.get_alpha_mod()
         self.blend_mode = self.get_blend_mode_int()
-        self.has_color_key = SDL_HasColorKey(self.surface)
-        self.has_rle = SDL_HasSurfaceRLE(self.surface)
-        self.must_lock = SDL_MUSTLOCK(self.surface)
+        self.has_color_key = bool(SDL_HasColorKey(self.surface))
+        self.has_rle = bool(SDL_HasSurfaceRLE(self.surface))
+        self.must_lock = bool(SDL_MUSTLOCK(self.surface))
 
     def update_blend_mode_by_alpha(self) -> None:
         SDL_SetSurfaceBlendMode(self.surface, SDL_BLENDMODE_NONE if self.alpha_mod >= 255 else SDL_BLENDMODE_NONE)
@@ -70,7 +70,7 @@ class Surface:
     def set_rle(self, enabled: bool) -> None:
         SDL_SetSurfaceRLE(self.surface, enabled)
         self.must_lock = SDL_MUSTLOCK(self.surface)
-        self.has_rle = SDL_HasSurfaceRLE(self.surface)
+        self.has_rle = bool(SDL_HasSurfaceRLE(self.surface))
 
     def map_rgba(self, color: any) -> int:
         return SDL_MapRGBA(self.surface.contents.format, int(color[0]), int(color[1]), int(color[2]), int(color[3]))
@@ -96,7 +96,10 @@ class Surface:
         if enabled:
             self.color_key = color_key
         SDL_SetColorKey(self.surface, enabled, color_key)
-        self.has_color_key = SDL_HasColorKey(self.surface)
+        try:
+            self.has_color_key = bool(SDL_HasColorKey(self.surface))
+        except NameError:
+            self.has_color_key = enabled
 
     def get_color_key(self) -> int:
         try:
