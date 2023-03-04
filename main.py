@@ -1,8 +1,8 @@
 import os
 import math
 import sys
+import time
 import wintheme  # noqa
-from PIL import Image  # noqa
 import goodgame as gg
 
 
@@ -54,33 +54,47 @@ class Renderer(gg.Renderer):
         super().__init__(window, vsync=False, backend=gg.BackendManager(window.app).get_best(), force_int=False)
         self.app: App = self.app
         self.window: Window = self.window
-        self.window.set_title(f'Good Window [{self.backend.name}]')
-        # self.test_tex = self.texture_from_file(self.app.p('example_files', 'img.png'))
-        img = Image.open(self.app.p('example_files', 'img.png'))
-        pd = img.tobytes()
-        surf: gg.Surface = self.app.surface_from_bytes(
-            pd,
-            img.size,
-            24,
-            img.size[0] * 3,
-            self.app.default_rgb_mask
-        )
-        surf.blit_scaled(surf, (0, 0, 50, 50), (100, 100, 200, 125))
         self.cursors = gg.CursorManager(self.app)
-        self.fps_font = gg.TTF(self.app, self.app.p('example_files', 'segoeuib.ttf'), 50)
-        self.fps_font.set_kerning(False)
         self.mixer = gg.Mixer(self.app)
-        self.music = gg.Music(self.mixer, self.app.p('example_files', 'music.mp3'))
+        self.loader = gg.Loader(
+            self.app,
+            [
+                ('image', self.app.p('example_files', 'img.png')),
+                ('music', self.app.p('example_files', 'music.mp3')),
+                ('sound', self.app.p('example_files', 'click.ogg')),
+                ('font', self.app.p('example_files', 'segoeuib.ttf'), 50)
+            ]
+        )
+        self.loader.load = self.load_file
+        self.loader.run()
+        while not self.loader.finished:
+            continue
+        self.window.set_title(f'Good Window [{self.backend.name}]')
+        self.fps_font = self.loader.result[3]
+        self.fps_font.set_kerning(False)
+        self.music = self.loader.result[1]
         self.music.set_volume(0.1)
         self.music.play(-1)
-        self.chunk = gg.Chunk(self.mixer, self.app.p('example_files', 'click.ogg'))
+        self.chunk = self.loader.result[2]
         self.chunk.set_chunk_volume(0.25)
-        self.test_tex = self.texture_from_surface(surf)
+        self.test_tex = self.texture_from_surface(self.loader.result[0])
         self.circle_pos = (0, 0)
         self.circle_radius = 65.0
         self.counter = 0
+        self.loader.destroy()
         self.window.show()
         self.window.raise_self()
+
+    def load_file(self, to_load: tuple) -> any:
+        time.sleep(0.25)
+        if to_load[0] == 'image':
+            return self.app.surface_from_file(to_load[1])
+        elif to_load[0] == 'music':
+            return gg.Music(self.mixer, to_load[1])
+        elif to_load[0] == 'sound':
+            return gg.Chunk(self.mixer, to_load[1])
+        elif to_load[0] == 'font':
+            return gg.TTF(self.app, to_load[1], to_load[2])
 
     def update(self) -> None:
         dt = self.app.clock.delta * (10 if self.app.get_key_state('2') else 1)

@@ -12,3 +12,4 @@ from .renderer import Renderer
 from .cursor import CursorManager, Cursor
 from .mixer import Mixer, Music, Chunk
 from .ttf import TTF
+from .loader import Loader
