@@ -8,6 +8,7 @@ from .surface import Surface, SurfaceAnimation
 from .video import PixelFormat
 from .window import Window
 from .touch import TouchDevice
+from .joystick import Joystick
 from sdl2 import *
 
 try:
@@ -141,10 +142,14 @@ class App:
         self.sdl_event = SDL_Event()
         self.destroyed = False
         # TODO:
+        #  joystick events
         #  RW ops (do we need them?)
         #  hidapi (do we need it?), joysticks, haptics, sensors, gestures (do we need them?)
         #  pixels (palettes, etc)
         #  Custom message box
+
+    def get_joysticks(self) -> tuple:
+        return tuple(Joystick(self, _x) for _x in range(SDL_NumJoysticks()))
 
     def get_touch_devices(self) -> tuple:
         return tuple(TouchDevice(self, _x) for _x in range(SDL_GetNumTouchDevices()))

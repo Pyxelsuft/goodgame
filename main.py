@@ -9,7 +9,9 @@ class App(gg.App):
     def __init__(self) -> None:
         super().__init__()
         # self.cwd = os.path.dirname(__file__) or os.getcwd()
-        self.init(sdl_flags_list=('video', 'events', 'timer', 'audio'), mixer_formats=('mp3', 'ogg'))
+        self.init(sdl_flags_list=(
+            'video', 'events', 'timer', 'audio', 'joystick', 'game_controller'
+        ), mixer_formats=('mp3', 'ogg'))
         self.window = Window(self, (800, 600))
         self.clock = gg.Clock()
         self.clock.reset()
