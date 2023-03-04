@@ -6,7 +6,7 @@ try:
 except NameError:
     SDL_TOUCH_MOUSEID = 2 ** 32 - 1
 
-default_window_id = [0]
+default_window_id = [1]
 
 
 class CommonEvent:
