@@ -127,6 +127,7 @@ class App:
             SDL_LOCALECHANGED: lambda: self.on_locale_change(CommonEvent(self.sdl_event.common)),
             SDL_KEYMAPCHANGED: lambda: self.on_keymap_change(CommonEvent(self.sdl_event.common))
         }
+        # TODO: SDL_CLIPBOARDUPDATE
         self.windows = {}
         self.running = False
         self.rel_mouse_mode = False

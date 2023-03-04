@@ -16,15 +16,18 @@ class TouchDevice:
             self.name = app.bts(SDL_GetTouchName(index))
         except NameError:
             self.name = ''
-        tp = SDL_GetTouchDeviceType(self.id)
-        if tp == SDL_TOUCH_DEVICE_DIRECT:
-            self.type = 'direct'
-        elif SDL_TOUCH_DEVICE_INDIRECT_ABSOLUTE:
-            self.type = 'indirect_absolute'
-        elif SDL_TOUCH_DEVICE_INDIRECT_RELATIVE:
-            self.type = 'indirect_relative'
-        else:
-            self.type = 'invalid'
+        try:
+            tp = SDL_GetTouchDeviceType(self.id)
+            if tp == SDL_TOUCH_DEVICE_DIRECT:
+                self.type = 'direct'
+            elif SDL_TOUCH_DEVICE_INDIRECT_ABSOLUTE:
+                self.type = 'indirect_absolute'
+            elif SDL_TOUCH_DEVICE_INDIRECT_RELATIVE:
+                self.type = 'indirect_relative'
+            else:
+                self.type = 'invalid'
+        except NameError:
+            self.type = 'unknown'
         self.num_fingers = SDL_GetNumTouchFingers(self.id)
 
     def get_finger(self, finger_id: int) -> Finger:
