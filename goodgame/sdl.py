@@ -2,9 +2,6 @@ from sdl2 import *
 
 
 sdl_dir = dir()
-for x in sdl_dir:
-    if x.startswith('SDL_'):
-        print(x)
 
 
 class SDLVersion:
