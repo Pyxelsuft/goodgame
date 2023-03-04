@@ -12,7 +12,10 @@ class TouchDevice:
     def __init__(self, app: any, index: int) -> None:
         self.index = index
         self.id = SDL_GetTouchDevice(index)
-        self.name = app.bts(SDL_GetTouchName(index))
+        try:
+            self.name = app.bts(SDL_GetTouchName(index))
+        except NameError:
+            self.name = ''
         tp = SDL_GetTouchDeviceType(self.id)
         if tp == SDL_TOUCH_DEVICE_DIRECT:
             self.type = 'direct'

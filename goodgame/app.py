@@ -136,8 +136,8 @@ class App:
         self.sdl_event = SDL_Event()
         self.destroyed = False
         # TODO:
-        #  RW ops (but is it needed?)
-        #  hidapi (does it needed?), joysticks, haptics, sensors, gestures
+        #  RW ops (do we need them?)
+        #  hidapi (do we need it?), joysticks, haptics, sensors, gestures
         #  pixels (palettes, etc)
         #  Custom message box
 
