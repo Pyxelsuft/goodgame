@@ -3,7 +3,8 @@ import ctypes
 from .exceptions import FlagNotFoundError, SDLError
 from .events import CommonEvent, QuitEvent, AudioDeviceEvent, DropEvent, TouchFingerEvent, KeyboardEvent,\
     MouseMotionEvent, MouseButtonEvent, MouseWheelEvent, TextEditingEvent, TextInputEvent, DisplayEvent, WindowEvent,\
-    JoyAxisEvent, JoyBallEvent, JoyButtonEvent, JoyDeviceEvent, JoyHatEvent, JoyBatteryEvent
+    JoyAxisEvent, JoyBallEvent, JoyButtonEvent, JoyDeviceEvent, JoyHatEvent, JoyBatteryEvent, ControllerAxisEvent,\
+    ControllerButtonEvent, ControllerDeviceEvent
 from .sdl import SDLVersion, sdl_dir
 from .surface import Surface, SurfaceAnimation
 from .video import PixelFormat

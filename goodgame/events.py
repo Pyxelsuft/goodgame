@@ -87,6 +87,66 @@ class JoyHatEvent(CommonEvent):
         }.get(event.value)
 
 
+class ControllerAxisEvent(CommonEvent):
+    def __init__(self, event: SDL_Event) -> None:
+        super().__init__(event)
+        self.instance_id = event.which
+        self.axis = {
+            SDL_CONTROLLER_AXIS_INVALID: 'invalid',
+            SDL_CONTROLLER_AXIS_LEFTX: 'left_x',
+            SDL_CONTROLLER_AXIS_LEFTY: 'left_y',
+            SDL_CONTROLLER_AXIS_RIGHTX: 'right_x',
+            SDL_CONTROLLER_AXIS_RIGHTY: 'right_y',
+            SDL_CONTROLLER_AXIS_TRIGGERLEFT: 'trigger_left',
+            SDL_CONTROLLER_AXIS_TRIGGERRIGHT: 'trigger_right',
+            SDL_CONTROLLER_AXIS_MAX: 'max'
+        }.get(event.axis)
+        self.value = event.value
+
+
+class ControllerButtonEvent(CommonEvent):
+    def __init__(self, event: SDL_Event) -> None:
+        super().__init__(event)
+        self.instance_id = event.which
+        self.button = {
+            SDL_CONTROLLER_BUTTON_INVALID: 'invalid',
+            SDL_CONTROLLER_BUTTON_A: 'a',
+            SDL_CONTROLLER_BUTTON_B: 'b',
+            SDL_CONTROLLER_BUTTON_X: 'x',
+            SDL_CONTROLLER_BUTTON_Y: 'y',
+            SDL_CONTROLLER_BUTTON_BACK: 'back',
+            SDL_CONTROLLER_BUTTON_GUIDE: 'guide',
+            SDL_CONTROLLER_BUTTON_START: 'start',
+            SDL_CONTROLLER_BUTTON_LEFTSTICK: 'left_stick',
+            SDL_CONTROLLER_BUTTON_RIGHTSTICK: 'right_stick',
+            SDL_CONTROLLER_BUTTON_LEFTSHOULDER: 'left_shoulder',
+            SDL_CONTROLLER_BUTTON_RIGHTSHOULDER: 'right_shoulder',
+            SDL_CONTROLLER_BUTTON_DPAD_UP: 'd_pad_up',
+            SDL_CONTROLLER_BUTTON_DPAD_DOWN: 'd_pad_down',
+            SDL_CONTROLLER_BUTTON_DPAD_LEFT: 'd_pad_left',
+            SDL_CONTROLLER_BUTTON_DPAD_RIGHT: 'd_pad_right',
+            SDL_CONTROLLER_BUTTON_MISC1: 'misc1',
+            SDL_CONTROLLER_BUTTON_PADDLE1: 'paddle1',
+            SDL_CONTROLLER_BUTTON_PADDLE2: 'paddle2',
+            SDL_CONTROLLER_BUTTON_PADDLE3: 'paddle2',
+            SDL_CONTROLLER_BUTTON_PADDLE4: 'paddle3',
+            SDL_CONTROLLER_BUTTON_TOUCHPAD: 'touchpad',
+            SDL_CONTROLLER_BUTTON_MAX: 'max'
+        }.get(event.button)
+        self.state = 'pressed' if event.state == SDL_PRESSED else 'released'
+
+
+class ControllerDeviceEvent(CommonEvent):
+    def __init__(self, event: SDL_Event) -> None:
+        super().__init__(event)
+        if self.type == SDL_JOYDEVICEADDED:
+            self.index = event.which
+            self.instance_id = 0
+        else:
+            self.index = 0
+            self.instance_id = event.which
+
+
 class AudioDeviceEvent(CommonEvent):
     def __init__(self, event: SDL_Event) -> None:
         super().__init__(event)
