@@ -54,6 +54,10 @@ try:
     MIX_INIT_MID = MIX_INIT_MID
 except NameError:
     MIX_INIT_MID = 0x00000020
+try:
+    MIX_INIT_OPUS = MIX_INIT_OPUS
+except NameError:
+    MIX_INIT_OPUS = 0x00000040
 
 
 class App:
