@@ -10,6 +10,7 @@ from .surface import Surface, SurfaceAnimation
 from .texture import Texture
 from .renderer import Renderer
 from .cursor import CursorManager, Cursor
+from .touch import TouchDevice, Finger
 from .mixer import Mixer, Music, Chunk
 from .ttf import TTF
 from .loader import Loader

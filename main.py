@@ -118,6 +118,9 @@ class Renderer(gg.Renderer):
         self.draw_rect((0, 255, 0), (100, 100, 100, 100))
         self.draw_rect((255, 0, 0), (100.5, 100.5, 100, 100), 20)
         self.set_scale((1, 1))
+        touch_devices = self.app.get_touch_devices()
+        if touch_devices:
+            print(touch_devices[0].name, touch_devices[0].get_all_fingers())
         if self.circle_animation.enabled:
             self.draw_circle(
                 (0, 255, 255, 255 - self.circle_animation.value * 4),

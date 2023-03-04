@@ -7,6 +7,7 @@ from .sdl import SDLVersion, sdl_dir
 from .surface import Surface, SurfaceAnimation
 from .video import PixelFormat
 from .window import Window
+from .touch import TouchDevice
 from sdl2 import *
 
 try:
@@ -135,11 +136,13 @@ class App:
         self.sdl_event = SDL_Event()
         self.destroyed = False
         # TODO:
-        #  RW ops
-        #  joysticks, haptics, sensors, gestures, touch
+        #  RW ops (but is it needed?)
+        #  hidapi (does it needed?), joysticks, haptics, sensors, gestures
         #  pixels (palettes, etc)
-        #  In window functions move to Window?
         #  Custom message box
+
+    def get_touch_devices(self) -> tuple:
+        return tuple(TouchDevice(self, _x) for _x in range(SDL_GetNumTouchDevices()))
 
     def get_key_state(self, key: str) -> bool:
         return bool(self.keyboard_state_ptr[SDL_GetScancodeFromName(self.stb(key))])
