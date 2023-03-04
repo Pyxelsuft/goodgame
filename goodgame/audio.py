@@ -69,14 +69,6 @@ class AudioDevice:
         if SDL_QueueAudio(self.id, data, size) < 0:
             self.app.raise_error()
 
-    def load_wav(self, path: str) -> WAV:
-        spec_ptr = SDL_AudioSpec(0, 0, 0, 0)
-        buf_ptr = ctypes.POINTER(ctypes.c_uint8)()
-        len_ptr = ctypes.c_uint32()
-        if not SDL_LoadWAV(self.app.stb(path), spec_ptr, buf_ptr, len_ptr):
-            self.app.raise_error()
-        return WAV(AudioSpec(spec_ptr, self.spec.is_capture, self.spec.device_name), buf_ptr, len_ptr.value)
-
     def lock(self) -> None:
         SDL_LockAudioDevice(self.id)
 
@@ -124,6 +116,14 @@ class AudioDeviceManager:
             self.default_recording_info = AudioSpec(is_capture=True)
         self.get_playback_devices()
         self.get_recording_devices()
+
+    def load_wav(self, path: str) -> WAV:
+        spec_ptr = SDL_AudioSpec(0, 0, 0, 0)
+        buf_ptr = ctypes.POINTER(ctypes.c_uint8)()
+        len_ptr = ctypes.c_uint32()
+        if not SDL_LoadWAV(self.app.stb(path), spec_ptr, buf_ptr, len_ptr):
+            self.app.raise_error()
+        return WAV(AudioSpec(spec_ptr, False), buf_ptr, len_ptr.value)
 
     def open_device(self, spec: AudioSpec) -> AudioDevice:
         spec_ptr = SDL_AudioSpec(0, 0, 0, 0)
