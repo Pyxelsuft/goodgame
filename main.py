@@ -3,7 +3,8 @@ import math
 import sys
 import time
 import wintheme  # noqa
-import goodgame as gg
+os.environ['GG_ENABLE_NUMBA'] = '1'
+import goodgame as gg  # noqa
 
 
 class App(gg.App):
@@ -54,6 +55,7 @@ class Renderer(gg.Renderer):
         super().__init__(window, vsync=False, backend=gg.BackendManager(window.app).get_best(), force_int=False)
         self.app: App = self.app
         self.window: Window = self.window
+        self.window.set_title(f'Good Window [{self.backend.name}]')
         self.cursors = gg.CursorManager(self.app)
         self.mixer = gg.Mixer(self.app)
         self.loader = gg.Loader(
@@ -67,9 +69,8 @@ class Renderer(gg.Renderer):
         )
         self.loader.load = self.load_file
         self.loader.run()
-        while not self.loader.finished:
+        while not self.loader.finished:  # It's better to create loading screen
             continue
-        self.window.set_title(f'Good Window [{self.backend.name}]')
         self.fps_font = self.loader.result[3]
         self.fps_font.set_kerning(False)
         self.music = self.loader.result[1]
@@ -86,7 +87,6 @@ class Renderer(gg.Renderer):
         self.window.raise_self()
 
     def load_file(self, to_load: tuple) -> any:
-        time.sleep(0.25)
         if to_load[0] == 'image':
             return self.app.surface_from_file(to_load[1])
         elif to_load[0] == 'music':

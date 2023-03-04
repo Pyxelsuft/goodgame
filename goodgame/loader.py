@@ -43,6 +43,7 @@ class Loader:
         if self.destroyed:
             return True
         del self.app
+        del self.load
         self.destroyed = True
         return False
 
