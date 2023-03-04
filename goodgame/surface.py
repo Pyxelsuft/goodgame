@@ -1,10 +1,16 @@
 import ctypes
 from .video import PixelFormat
 from sdl2 import *
+
 try:
     from sdl2.sdlimage import *
 except:  # noqa
     pass
+
+try:
+    IMG_Animation = IMG_Animation
+except NameError:
+    IMG_Animation = any
 
 
 class Surface:
@@ -202,6 +208,26 @@ class Surface:
     def save_to_jpg(self, path: str, quality: float = 1.0) -> None:
         if IMG_SaveJPG(self.surface, self.app.stb(path), int(quality * 100)) < 0:
             self.app.raise_error(IMG_GetError)
+
+    def __del__(self) -> None:
+        self.destroy()
+
+
+class SurfaceAnimation:
+    def __init__(self, animation: IMG_Animation, app: any) -> None:
+        self.destroyed = True
+        self.animation = animation
+        self.w, self.h = animation.w, animation.h
+        self.surfaces = tuple(Surface(animation.frames[_x], app) for _x in range(animation.count))
+        self.delays = tuple(animation.delays[_x] for _x in range(animation.count))
+        self.destroyed = False
+
+    def destroy(self) -> bool:
+        if self.destroyed:
+            return True
+        IMG_FreeAnimation(self.animation)
+        self.destroyed = True
+        return False
 
     def __del__(self) -> None:
         self.destroy()

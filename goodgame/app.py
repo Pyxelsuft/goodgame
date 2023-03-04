@@ -4,7 +4,7 @@ from .exceptions import FlagNotFoundError, SDLError
 from .events import CommonEvent, QuitEvent, AudioDeviceEvent, DropEvent, TouchFingerEvent, KeyboardEvent,\
     MouseMotionEvent, MouseButtonEvent, MouseWheelEvent, TextEditingEvent, TextInputEvent, DisplayEvent, WindowEvent
 from .sdl import SDLVersion, sdl_dir
-from .surface import Surface
+from .surface import Surface, SurfaceAnimation
 from .video import PixelFormat
 from .window import Window
 from sdl2 import *
@@ -135,9 +135,7 @@ class App:
         self.sdl_event = SDL_Event()
         self.destroyed = False
         # TODO:
-        #  math
         #  RW ops
-        #  gifs (animations) loading
         #  joysticks, haptics, sensors, gestures, touch
         #  pixels (palettes, etc)
         #  In window functions move to Window?
@@ -357,6 +355,12 @@ class App:
         if not surf:
             self.raise_error(IMG_GetError)
         return Surface(surf, self)
+
+    def animation_from_file(self, path: str) -> SurfaceAnimation:
+        anim = IMG_LoadAnimation(self.stb(path))
+        if not anim:
+            self.raise_error(IMG_GetError)
+        return SurfaceAnimation(anim, self)
 
     def poll_events(self) -> None:
         while SDL_PollEvent(self.sdl_event):

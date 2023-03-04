@@ -24,6 +24,8 @@ class Math:
             self.intersect_rect_and_line = self.intersect_rect_and_line_i
             self.enclose_points = self.enclose_points_i
         self.destroyed = False
+        # TODO
+        #  add more functions
 
     @staticmethod
     def enclose_points(r: any, points: any) -> tuple:
