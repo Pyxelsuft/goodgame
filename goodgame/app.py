@@ -132,7 +132,6 @@ class App:
             SDL_KEYMAPCHANGED: lambda: self.on_keymap_change(CommonEvent(self.sdl_event.common)),
             SDL_CLIPBOARDUPDATE: lambda: self.on_clipboard_update(CommonEvent(self.sdl_event.common))
         }
-        # TODO: SDL_CLIPBOARDUPDATE
         self.windows = {}
         self.running = False
         self.rel_mouse_mode = False
