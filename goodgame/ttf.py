@@ -8,6 +8,11 @@ try:
 except:  # noqa
     pass
 
+try:
+    TTF_HINTING_LIGHT_SUBPIXEL = TTF_HINTING_LIGHT_SUBPIXEL
+except NameError:
+    TTF_HINTING_LIGHT_SUBPIXEL = 4
+
 
 class TTF:
     def __init__(self, app: any, path: str, size: float, index: int = 0) -> None:
