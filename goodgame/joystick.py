@@ -69,7 +69,7 @@ class Joystick:
         self.destroyed = False
         # TODO:
         #  GUID functions
-        #  Virtual Joysticks if needed (it's for you, I'm lazy!!!!!!!!!!!
+        #  Virtual Joysticks if needed (it's for you, I'm lazy!!!!!!!!!!!)
 
     def send_effect(self, data: bytes) -> None:
         SDL_JoystickSendEffect(self.joystick, data, len(data))
