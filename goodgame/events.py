@@ -147,6 +147,26 @@ class ControllerDeviceEvent(CommonEvent):
             self.instance_id = event.which
 
 
+class ControllerTouchpadEvent(CommonEvent):
+    def __init__(self, event: SDL_Event) -> None:
+        super().__init__(event)
+        self.instance_id = event.which
+        self.touchpad = event.touchpad
+        self.finger = event.finger
+        self.pos = (event.x, event.y)
+        self.pressure = event.pressure
+
+
+class ControllerSensorEvent(CommonEvent):
+    def __init__(self, event: SDL_Event) -> None:
+        super().__init__(event)
+        self.instance_id = event.which
+        self.sensor = event.sensor
+        self.pos = (event.x, event.y)
+        self.data = (event.data[0], event.data[1], event.data[2])
+        self.time = event.timestamp_us / 1  # TODO: convert to seconds
+
+
 class AudioDeviceEvent(CommonEvent):
     def __init__(self, event: SDL_Event) -> None:
         super().__init__(event)
