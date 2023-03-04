@@ -1,4 +1,5 @@
 import ctypes
+from . import events
 from .events import DropEvent, TouchFingerEvent, KeyboardEvent, MouseMotionEvent, MouseButtonEvent, MouseWheelEvent,\
     TextEditingEvent, TextInputEvent, WindowEvent
 from .video import DisplayMode, PixelFormat
@@ -82,6 +83,7 @@ class Window:
         self.update_size()
         self.display_mode = self.get_display_mode()
         self.id = SDL_GetWindowID(self.window)
+        events.default_window_id = self.id
         app.windows[self.id] = self
         self.destroyed = False
         # TODO:

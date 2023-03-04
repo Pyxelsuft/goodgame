@@ -51,7 +51,7 @@ class Window(gg.Window):
 
 class Renderer(gg.Renderer):
     def __init__(self, window: any) -> None:
-        super().__init__(window, vsync=True, backend=gg.BackendManager(window.app).get_best(), force_int=False)
+        super().__init__(window, vsync=False, backend=gg.BackendManager(window.app).get_best(), force_int=False)
         self.app: App = self.app
         self.window: Window = self.window
         self.window.set_title(f'Good Window [{self.backend.name}]')

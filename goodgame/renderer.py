@@ -502,6 +502,16 @@ class Renderer:
             return True
         SDL_DestroyRenderer(self.renderer)
         self.destroyed = True
+        self.blit = None
+        self.blit_ex = None
+        self.draw_point = None
+        self.draw_points = None
+        self.sdl_draw_rect = None
+        self.sdl_draw_rects = None
+        self.sdl_fill_rect = None
+        self.sdl_fill_rects = None
+        self.sdl_draw_line = None
+        self.sdl_draw_lines = None
         del self.window
         del self.app
         return False
