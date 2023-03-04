@@ -1,7 +1,6 @@
 import ctypes
-from .events import default_window_id
 from .events import DropEvent, TouchFingerEvent, KeyboardEvent, MouseMotionEvent, MouseButtonEvent, MouseWheelEvent,\
-    TextEditingEvent, TextInputEvent, WindowEvent
+    TextEditingEvent, TextInputEvent, WindowEvent, default_window_id
 from .video import DisplayMode, PixelFormat
 from .surface import Surface
 from sdl2 import *
