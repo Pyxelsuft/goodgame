@@ -15,6 +15,10 @@ try:
     MUS_MODPLUG_UNUSED = MUS_MODPLUG_UNUSED
 except NameError:
     MUS_MODPLUG_UNUSED = 10
+try:
+    MUS_OPUS = MUS_OPUS
+except NameError:
+    MUS_OPUS = 11
 
 
 # TODO:
