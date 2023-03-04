@@ -43,7 +43,10 @@ class TTF:
         self.fixed_width = bool(TTF_FontFaceIsFixedWidth(self.font))
         self.face = app.bts(TTF_FontFaceFamilyName(self.font))
         self.face_style = app.bts(TTF_FontFaceStyleName(self.font))
-        self.sdf = bool(TTF_GetFontSDF(self.font))
+        try:
+            self.sdf = bool(TTF_GetFontSDF(self.font))
+        except NameError:
+            self.sdf = False
         self.hinting = self.r_hint_map[TTF_GetFontHinting(self.font)]
         self.height = 0
         self.ascent = 0
