@@ -5,6 +5,11 @@ from .video import DisplayMode, PixelFormat
 from .surface import Surface
 from sdl2 import *
 
+try:
+    SDL_WINDOWEVENT_ICCPROF_CHANGED = SDL_WINDOWEVENT_ICCPROF_CHANGED
+except NameError:
+    SDL_WINDOWEVENT_ICCPROF_CHANGED = 17
+
 
 class Window:
     def __init__(
