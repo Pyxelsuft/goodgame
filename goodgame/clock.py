@@ -14,6 +14,15 @@ class Clock:
         self.last_tick = 0
         self.fps_limit = 0
 
+    @staticmethod
+    def get_time() -> float:
+        return SDL_GetTicks64() / 1000
+
+    def sleep(self, time: float) -> None:
+        wait_for = self.get_time() + time
+        while self.get_time() < wait_for:
+            continue
+
     def reset(self) -> None:
         self.last_tick = SDL_GetPerformanceCounter()
 

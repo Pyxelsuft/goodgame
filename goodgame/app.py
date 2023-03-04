@@ -130,6 +130,7 @@ class App:
         self.running = False
         self.rel_mouse_mode = False
         self.mouse_capture = False
+        self.platform = self.bts(SDL_GetPlatform())
         self.keyboard_state_ptr = SDL_GetKeyboardState(None)
         self.sdl_event = SDL_Event()
         self.destroyed = False
@@ -236,15 +237,6 @@ class App:
     def enable_text_input(enabled: bool) -> None:
         (SDL_StartTextInput if enabled else SDL_StopTextInput)()
 
-    @staticmethod
-    def get_time() -> float:
-        return SDL_GetTicks64() / 1000
-
-    def sleep(self, time: float) -> None:
-        wait_for = self.get_time() + time
-        while self.get_time() < wait_for:
-            continue
-
     def set_clipboard_text(self, text: str) -> None:
         SDL_SetClipboardText(self.stb(text))
 
@@ -260,9 +252,6 @@ class App:
         if not SDL_HasPrimarySelectionText():
             return ''
         return self.bts(SDL_GetPrimarySelectionText())
-
-    def get_platform(self) -> str:
-        return self.bts(SDL_GetPlatform())
 
     def open_url(self, url: str) -> None:
         if SDL_OpenURL(self.stb(url)) < 0:
