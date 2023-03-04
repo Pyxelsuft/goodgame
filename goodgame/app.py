@@ -50,6 +50,10 @@ try:
     IMG_INIT_AVIF = IMG_INIT_AVIF
 except NameError:
     IMG_INIT_AVIF = 0x00000020
+try:
+    MIX_INIT_MID = MIX_INIT_MID
+except NameError:
+    MIX_INIT_MID = 0x00000020
 
 
 class App:
