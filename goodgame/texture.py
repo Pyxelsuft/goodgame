@@ -19,7 +19,10 @@ class Texture:
 
     def get_scale_mode(self) -> str:
         scale_mode_ptr = ctypes.c_int()
-        SDL_GetTextureScaleMode(self.texture, scale_mode_ptr)
+        try:
+            SDL_GetTextureScaleMode(self.texture, scale_mode_ptr)
+        except NameError:
+            return 'best'
         if scale_mode_ptr.value == SDL_ScaleModeBest:
             return 'best'
         if scale_mode_ptr.value == SDL_ScaleModeNearest:
