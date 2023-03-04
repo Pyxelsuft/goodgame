@@ -27,19 +27,17 @@ class Loader:
         self.result.clear()
 
     def run(self) -> None:
-        # print(threading.current_thread())
-        threading.Thread(target=self.thread).run()
-
-    def load(self, to_load: any) -> any:
-        pass
+        threading.Thread(target=self.thread).start()
 
     def thread(self) -> None:
-        # print(threading.current_thread())
         while self.to_load:
             self.result.append(self.load(self.to_load.pop(0)))
             self.counter += 1
             self.progress = self.counter / self.total_len
         self.finished = True
+
+    def load(self, to_load: any) -> any:
+        pass
 
     def destroy(self) -> bool:
         if self.destroyed:
