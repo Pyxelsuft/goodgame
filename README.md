@@ -1,7 +1,7 @@
 # GoodGame
 A Simple API for making games
 # Docs
-TODO, but you can see examples
+TODO, but you can see examples and code itself
 # Standards
  - time: seconds (float)
  - rect / point: array (int or float)
