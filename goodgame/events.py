@@ -44,6 +44,22 @@ class JoyButtonEvent(CommonEvent):
         self.state = 'pressed' if event.state == SDL_PRESSED else 'released'
 
 
+class JoyBatteryEvent(CommonEvent):
+    def __init__(self, event: SDL_Event) -> None:
+        super().__init__(event)
+        self.instance_id = event.which
+        self.button = event.button
+        self.level = {
+            SDL_JOYSTICK_POWER_UNKNOWN: 'unknown',
+            SDL_JOYSTICK_POWER_EMPTY: 'empty',
+            SDL_JOYSTICK_POWER_LOW: 'low',
+            SDL_JOYSTICK_POWER_MEDIUM: 'medium',
+            SDL_JOYSTICK_POWER_FULL: 'full',
+            SDL_JOYSTICK_POWER_WIRED: 'wired',
+            SDL_JOYSTICK_POWER_MAX: 'max'
+        }.get(event.level)
+
+
 class JoyDeviceEvent(CommonEvent):
     def __init__(self, event: SDL_Event) -> None:
         super().__init__(event)

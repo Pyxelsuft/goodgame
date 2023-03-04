@@ -3,7 +3,7 @@ import ctypes
 from .exceptions import FlagNotFoundError, SDLError
 from .events import CommonEvent, QuitEvent, AudioDeviceEvent, DropEvent, TouchFingerEvent, KeyboardEvent,\
     MouseMotionEvent, MouseButtonEvent, MouseWheelEvent, TextEditingEvent, TextInputEvent, DisplayEvent, WindowEvent,\
-    JoyAxisEvent, JoyBallEvent, JoyButtonEvent, JoyDeviceEvent, JoyHatEvent
+    JoyAxisEvent, JoyBallEvent, JoyButtonEvent, JoyDeviceEvent, JoyHatEvent, JoyBatteryEvent
 from .sdl import SDLVersion, sdl_dir
 from .surface import Surface, SurfaceAnimation
 from .video import PixelFormat
@@ -45,6 +45,10 @@ try:
     SDL_CLIPBOARDUPDATE = SDL_CLIPBOARDUPDATE
 except NameError:
     SDL_CLIPBOARDUPDATE = 0x900
+try:
+    SDL_JOYBATTERYUPDATED = SDL_JOYBATTERYUPDATED
+except NameError:
+    SDL_JOYBATTERYUPDATED = 0x607
 try:
     SDL_INIT_SENSOR = SDL_INIT_SENSOR
 except NameError:
@@ -137,9 +141,10 @@ class App:
             SDL_JOYBALLMOTION: lambda: self.on_joy_ball_motion(JoyBallEvent(self.sdl_event.jball)),
             SDL_JOYBUTTONDOWN: lambda: self.on_joy_button_down(JoyButtonEvent(self.sdl_event.jbutton)),
             SDL_JOYBUTTONUP: lambda: self.on_joy_button_up(JoyButtonEvent(self.sdl_event.jbutton)),
-            SDL_JOYDEVICEADDED: lambda: self.on_joy_device_added(JoyDeviceEvent(self.sdl_event.jdevice)),
-            SDL_JOYDEVICEREMOVED: lambda: self.on_joy_device_removed(JoyDeviceEvent(self.sdl_event.jdevice)),
-            SDL_JOYHATMOTION: lambda: self.on_joy_hat_motion(JoyHatEvent(self.sdl_event.jhat))
+            SDL_JOYDEVICEADDED: lambda: self.on_joy_device_add(JoyDeviceEvent(self.sdl_event.jdevice)),
+            SDL_JOYDEVICEREMOVED: lambda: self.on_joy_device_remove(JoyDeviceEvent(self.sdl_event.jdevice)),
+            SDL_JOYHATMOTION: lambda: self.on_joy_hat_motion(JoyHatEvent(self.sdl_event.jhat)),
+            SDL_JOYBATTERYUPDATED: lambda: self.on_joy_battery_update(JoyBatteryEvent(self.sdl_event.jbattery))
         }
         self.windows = {}
         self.running = False
@@ -651,13 +656,16 @@ class App:
     def on_joy_button_up(self, event: JoyButtonEvent) -> None:
         pass
 
-    def on_joy_device_added(self, event: JoyDeviceEvent) -> None:
+    def on_joy_device_add(self, event: JoyDeviceEvent) -> None:
         pass
 
-    def on_joy_device_removed(self, event: JoyDeviceEvent) -> None:
+    def on_joy_device_remove(self, event: JoyDeviceEvent) -> None:
         pass
 
     def on_joy_hat_motion(self, event: JoyHatEvent) -> None:
+        pass
+
+    def on_joy_battery_update(self, event: JoyBatteryEvent) -> None:
         pass
 
     def __del__(self) -> None:
