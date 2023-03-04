@@ -5,4 +5,4 @@ TODO, but you can see examples
 # Examples
 [test](main.py)
 # TODO
- - See [here](search?q=TODO&type=)
+ - See [here](/search?q=TODO&type=)
