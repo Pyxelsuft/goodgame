@@ -113,7 +113,7 @@ class App:
             SDL_DROPTEXT: lambda: self.on_drop_text(DropEvent(self.sdl_event.drop, self)),
             SDL_DROPBEGIN: lambda: self.on_drop_begin(DropEvent(self.sdl_event.drop, self)),
             SDL_DROPCOMPLETE: lambda: self.on_drop_complete(DropEvent(self.sdl_event.drop, self)),
-            SDL_FINGERMOTION: lambda: self.on_finger_motion(TouchFingerEvent(self.sdl_event.tfinger, self)),
+            SDL_FINGERMOTION: lambda: self.on_finger_move(TouchFingerEvent(self.sdl_event.tfinger, self)),
             SDL_FINGERDOWN: lambda: self.on_finger_down(TouchFingerEvent(self.sdl_event.tfinger, self)),
             SDL_FINGERUP: lambda: self.on_finger_up(TouchFingerEvent(self.sdl_event.tfinger, self)),
             SDL_KEYDOWN: lambda: self.on_key_down(KeyboardEvent(self.sdl_event.key, self)),
@@ -138,14 +138,30 @@ class App:
             SDL_LOCALECHANGED: lambda: self.on_locale_change(CommonEvent(self.sdl_event.common)),
             SDL_KEYMAPCHANGED: lambda: self.on_keymap_change(CommonEvent(self.sdl_event.common)),
             SDL_CLIPBOARDUPDATE: lambda: self.on_clipboard_update(CommonEvent(self.sdl_event.common)),
-            SDL_JOYAXISMOTION: lambda: self.on_joy_axis_motion(JoyAxisEvent(self.sdl_event.jaxis)),
-            SDL_JOYBALLMOTION: lambda: self.on_joy_ball_motion(JoyBallEvent(self.sdl_event.jball)),
+            SDL_JOYAXISMOTION: lambda: self.on_joy_axis_move(JoyAxisEvent(self.sdl_event.jaxis)),
+            SDL_JOYBALLMOTION: lambda: self.on_joy_ball_move(JoyBallEvent(self.sdl_event.jball)),
             SDL_JOYBUTTONDOWN: lambda: self.on_joy_button_down(JoyButtonEvent(self.sdl_event.jbutton)),
             SDL_JOYBUTTONUP: lambda: self.on_joy_button_up(JoyButtonEvent(self.sdl_event.jbutton)),
             SDL_JOYDEVICEADDED: lambda: self.on_joy_device_add(JoyDeviceEvent(self.sdl_event.jdevice)),
             SDL_JOYDEVICEREMOVED: lambda: self.on_joy_device_remove(JoyDeviceEvent(self.sdl_event.jdevice)),
-            SDL_JOYHATMOTION: lambda: self.on_joy_hat_motion(JoyHatEvent(self.sdl_event.jhat)),
-            SDL_JOYBATTERYUPDATED: lambda: self.on_joy_battery_update(JoyBatteryEvent(self.sdl_event.jbattery))
+            SDL_JOYHATMOTION: lambda: self.on_joy_hat_move(JoyHatEvent(self.sdl_event.jhat)),
+            SDL_JOYBATTERYUPDATED: lambda: self.on_joy_battery_update(JoyBatteryEvent(self.sdl_event.jbattery)),
+            SDL_CONTROLLERAXISMOTION: lambda: self.on_controller_axis_move(ControllerAxisEvent(self.sdl_event.caxis)),
+            SDL_CONTROLLERBUTTONDOWN: lambda: self.on_controller_button_down(
+                ControllerButtonEvent(self.sdl_event.cbutton)
+            ),
+            SDL_CONTROLLERBUTTONUP: lambda: self.on_controller_button_up(
+                ControllerButtonEvent(self.sdl_event.cbutton)
+            ),
+            SDL_CONTROLLERDEVICEADDED: lambda: self.on_controller_device_add(
+                ControllerDeviceEvent(self.sdl_event.cdevice)
+            ),
+            SDL_CONTROLLERDEVICEREMOVED: lambda: self.on_controller_device_remove(
+                ControllerDeviceEvent(self.sdl_event.cdevice)
+            ),
+            SDL_CONTROLLERDEVICEREMAPPED: lambda: self.on_controller_device_remap(
+                ControllerDeviceEvent(self.sdl_event.cdevice)
+            ),
         }
         self.windows = {}
         self.running = False
@@ -562,8 +578,8 @@ class App:
     def on_drop_complete(self, event: DropEvent) -> None:  # noqa
         event.window.on_drop_complete(event)
 
-    def on_finger_motion(self, event: TouchFingerEvent) -> None:  # noqa
-        event.window.on_finger_motion(event)
+    def on_finger_move(self, event: TouchFingerEvent) -> None:  # noqa
+        event.window.on_finger_move(event)
 
     def on_finger_down(self, event: TouchFingerEvent) -> None:  # noqa
         event.window.on_finger_down(event)
@@ -645,10 +661,10 @@ class App:
     def on_render_device_reset(self, event: CommonEvent) -> None:
         pass
 
-    def on_joy_axis_motion(self, event: JoyAxisEvent) -> None:
+    def on_joy_axis_move(self, event: JoyAxisEvent) -> None:
         pass
 
-    def on_joy_ball_motion(self, event: JoyBallEvent) -> None:
+    def on_joy_ball_move(self, event: JoyBallEvent) -> None:
         pass
 
     def on_joy_button_down(self, event: JoyButtonEvent) -> None:
@@ -663,10 +679,28 @@ class App:
     def on_joy_device_remove(self, event: JoyDeviceEvent) -> None:
         pass
 
-    def on_joy_hat_motion(self, event: JoyHatEvent) -> None:
+    def on_joy_hat_move(self, event: JoyHatEvent) -> None:
         pass
 
     def on_joy_battery_update(self, event: JoyBatteryEvent) -> None:
+        pass
+
+    def on_controller_axis_move(self, event: ControllerAxisEvent) -> None:
+        pass
+
+    def on_controller_button_down(self, event: ControllerButtonEvent) -> None:
+        pass
+
+    def on_controller_button_up(self, event: ControllerButtonEvent) -> None:
+        pass
+
+    def on_controller_device_add(self, event: ControllerDeviceEvent) -> None:
+        pass
+
+    def on_controller_device_remove(self, event: ControllerDeviceEvent) -> None:
+        pass
+
+    def on_controller_device_remap(self, event: ControllerDeviceEvent) -> None:
         pass
 
     def __del__(self) -> None:
