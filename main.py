@@ -105,7 +105,7 @@ class Renderer(gg.Renderer):
         self.rotate_animation.tick(dt)
         self.circle_animation.tick(dt)
         self.set_scale((self.scale_animation.value, self.scale_animation.value))
-        # self.fps_font.set_scale([math.sin(self.counter) / 2 + 0.75 for _ in range(2)])
+        # self.fps_font.set_scale((self.scale_animation.value, self.scale_animation.value))
         self.clear()
         self.blit_ex(
             self.test_tex,
