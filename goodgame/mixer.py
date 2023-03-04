@@ -247,27 +247,50 @@ class Mixer:
     ) -> None:
         self.destroyed = True
         self.app = app
-        self.format_map = {
-            'u8': AUDIO_U8,
-            's8': AUDIO_S8,
-            'u16lsb': AUDIO_U16LSB,
-            's16lsb': AUDIO_S16LSB,
-            'u16msb': AUDIO_U16MSB,
-            's16msb': AUDIO_S16MSB,
-            'u16': AUDIO_U16,
-            's16': AUDIO_S16,
-            's32lsb': AUDIO_S32LSB,
-            's32msb': AUDIO_S32MSB,
-            's32': AUDIO_S32,
-            'f32lsb': AUDIO_F32LSB,
-            'f32msb': AUDIO_F32MSB,
-            'f32': AUDIO_F32,
-            'u16sys': AUDIO_U16SYS,
-            's16sys': AUDIO_S16SYS,
-            's32sys': AUDIO_S32SYS,
-            'f32sys': AUDIO_F32SYS,
-            'default': MIX_DEFAULT_FORMAT
-        }
+        try:
+            self.format_map = {
+                'u8': AUDIO_U8,
+                's8': AUDIO_S8,
+                'u16lsb': AUDIO_U16LSB,
+                's16lsb': AUDIO_S16LSB,
+                'u16msb': AUDIO_U16MSB,
+                's16msb': AUDIO_S16MSB,
+                'u16': AUDIO_U16,
+                's16': AUDIO_S16,
+                's32lsb': AUDIO_S32LSB,
+                's32msb': AUDIO_S32MSB,
+                's32': AUDIO_S32,
+                'f32lsb': AUDIO_F32LSB,
+                'f32msb': AUDIO_F32MSB,
+                'f32': AUDIO_F32,
+                'u16sys': AUDIO_U16SYS,
+                's16sys': AUDIO_S16SYS,
+                's32sys': AUDIO_S32SYS,
+                'f32sys': AUDIO_F32SYS,
+                'default': MIX_DEFAULT_FORMAT
+            }
+        except NameError:
+            self.format_map = {
+                'u8': 8,
+                's8': 32776,
+                'u16lsb': 16,
+                's16lsb': 32784,
+                'u16msb': 4112,
+                's16msb': 36880,
+                'u16': 16,
+                's16': 32784,
+                's32lsb': 32800,
+                's32msb': 36896,
+                's32': 32800,
+                'f32lsb': 33056,
+                'f32msb': 37152,
+                'f32': 33056,
+                'u16sys': 16,
+                's16sys': 32784,
+                's32sys': 32800,
+                'f32sys': 33056,
+                'default': 32784 if SDL_BYTEORDER == SDL_LIL_ENDIAN else 36880
+            }
         self.freq = int(freq)
         self.format = self.format_map[audio_format.lower()]
         self.channels = num_channels
