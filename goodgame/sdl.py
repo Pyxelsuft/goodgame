@@ -2,6 +2,7 @@ from sdl2 import *
 
 
 sdl_dir = dir()
+print(sdl_dir)
 
 
 class SDLVersion:
