@@ -157,7 +157,7 @@ class Music:
             self.loop_start = Mix_GetMusicLoopStartTime(self.music)
             self.loop_end = Mix_GetMusicLoopEndTime(self.music)
             self.loop_length = Mix_GetMusicLoopLengthTime(self.music)
-        except RuntimeError:
+        except (RuntimeError, NameError):
             self.title = ''
             self.title_tag = ''
             self.artist_tag = ''
