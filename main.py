@@ -1,7 +1,5 @@
 import os
 import math
-import sys
-import time
 import wintheme  # noqa
 os.environ['GG_ENABLE_NUMBA'] = '1'
 import goodgame as gg  # noqa
