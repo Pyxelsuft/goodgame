@@ -7,6 +7,15 @@ try:
 except:  # noqa
     pass
 
+try:
+    MUS_MP3_MAD_UNUSED = MUS_MP3_MAD_UNUSED
+except NameError:
+    MUS_MP3_MAD_UNUSED = 7
+try:
+    MUS_MODPLUG_UNUSED = MUS_MODPLUG_UNUSED
+except NameError:
+    MUS_MODPLUG_UNUSED = 10
+
 
 # TODO:
 #  Effects, etc
