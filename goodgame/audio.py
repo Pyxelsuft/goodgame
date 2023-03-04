@@ -119,7 +119,7 @@ class AudioDeviceManager:
         try:
             self.default_playback_info = self.get_default_playback_info()
             self.default_recording_info = self.get_default_recording_info()
-        except RuntimeError:
+        except (RuntimeError, NameError):
             self.default_playback_info = AudioSpec(is_capture=False)
             self.default_recording_info = AudioSpec(is_capture=True)
         self.get_playback_devices()
