@@ -1,6 +1,11 @@
 from sdl2 import *
 from .video import Display
 
+try:
+    SDL_TOUCH_MOUSEID = SDL_TOUCH_MOUSEID
+except NameError:
+    SDL_TOUCH_MOUSEID = 2 ** 32 - 1
+
 
 class CommonEvent:
     def __init__(self, event: SDL_Event) -> None:
