@@ -70,7 +70,18 @@ class Joystick:
         # TODO:
         #  GUID functions
         #  Virtual Joysticks if needed (it's for you, I'm lazy!!!!!!!!!!!
-        #  Rumbles, LED, Effects
+
+    def send_effect(self, data: bytes) -> None:
+        SDL_JoystickSendEffect(self.joystick, data, len(data))
+
+    def set_led(self, color: any) -> None:
+        SDL_JoystickSetLED(self.joystick, int(color[0]), int(color[1]), int(color[2]))
+
+    def rumble(self, low_freq_rumble: int, high_freq_rumble: int, duration: float) -> None:
+        SDL_JoystickRumble(self.joystick, low_freq_rumble, high_freq_rumble, int(duration * 1000))
+
+    def rumble_triggers(self, low_freq_rumble: int, high_freq_rumble: int, duration: float) -> None:
+        SDL_JoystickRumbleTriggers(self.joystick, low_freq_rumble, high_freq_rumble, int(duration * 1000))
 
     def update_info(self) -> None:
         self.opened = True
