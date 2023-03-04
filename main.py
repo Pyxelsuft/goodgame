@@ -40,7 +40,8 @@ class Window(gg.Window):
     def on_mouse_down(self, event: gg.MouseButtonEvent) -> None:
         if event.button == 0:
             self.renderer.circle_pos = event.pos
-            self.renderer.circle_radius = 0
+            self.renderer.circle_animation.reset()
+            self.renderer.circle_animation.run()
             self.renderer.chunk.play()
 
     def on_key_down(self, event: gg.KeyboardEvent) -> None:
@@ -78,8 +79,12 @@ class Renderer(gg.Renderer):
         self.chunk.set_chunk_volume(0.25)
         self.test_tex = self.texture_from_surface(self.loader.result[0])
         self.circle_pos = (0, 0)
-        self.circle_radius = 65.0
-        self.counter = 0
+        self.scale_animation = gg.Animation(math.pi * 2, repeat=True, enabled=True)
+        self.scale_animation.calc = lambda x: math.sin(x) / 5 + 1
+        self.rotate_animation = gg.Animation(math.pi * 2, repeat=True, enabled=True)
+        self.rotate_animation.calc = lambda x: math.sin(x * 2) * 10
+        self.circle_animation = gg.Animation(255 / 4 / 150)
+        self.circle_animation.calc = lambda x: x * 150
         self.loader.destroy()
         self.window.show()
         self.window.raise_self()
@@ -96,28 +101,29 @@ class Renderer(gg.Renderer):
 
     def update(self) -> None:
         dt = self.app.clock.delta * (10 if self.app.get_key_state('2') else 1)
-        self.set_scale([math.sin(self.counter) / 5 + 1 for _ in range(2)])
+        self.scale_animation.tick(dt)
+        self.rotate_animation.tick(dt)
+        self.circle_animation.tick(dt)
+        self.set_scale((self.scale_animation.value, self.scale_animation.value))
         # self.fps_font.set_scale([math.sin(self.counter) / 2 + 0.75 for _ in range(2)])
         self.clear()
         self.blit_ex(
             self.test_tex,
             dst_rect=(80, 100),
-            angle=math.sin(self.counter * 2) * 10,
-            flip_horizontal=(self.counter * 4) % 2 >= 1
+            angle=self.rotate_animation.value,
+            flip_horizontal=False
         )
         self.draw_rect((0, 255, 0), (100, 100, 100, 100))
         self.draw_rect((255, 0, 0), (100.5, 100.5, 100, 100), 20)
         self.set_scale((1, 1))
-        if self.circle_radius <= 64:
+        if self.circle_animation.enabled:
             self.draw_circle(
-                (0, 255, 255, 255 - self.circle_radius * 4),
-                self.circle_pos, self.circle_radius
+                (0, 255, 255, 255 - self.circle_animation.value * 4),
+                self.circle_pos, self.circle_animation.value
             )
-            self.circle_radius += 150 * dt
         self.blit(self.texture_from_surface(
             self.fps_font.render_text(f'FPS: {self.app.clock.get_fps()}', (0, 255, 255), blend=True)
         ), dst_rect=(0, self.fps_font.descent))
-        self.counter += dt
         self.flip()
 
 

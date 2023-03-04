@@ -1,6 +1,6 @@
 from .exceptions import FlagNotFoundError, SDLError
 from .app import App
-from .clock import Clock
+from .clock import Clock, Timer, Animation
 from .events import CommonEvent, QuitEvent, AudioDeviceEvent, DropEvent, TouchFingerEvent, KeyboardEvent,\
     MouseMotionEvent, MouseButtonEvent, MouseWheelEvent, TextEditingEvent, TextInputEvent, DisplayEvent, WindowEvent
 from .audio import AudioDeviceManager, AudioSpec, AudioDevice
