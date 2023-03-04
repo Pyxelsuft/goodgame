@@ -26,7 +26,10 @@ class Surface:
         self.color_key = self.get_color_key()
         self.alpha_mod = self.get_alpha_mod()
         self.blend_mode = self.get_blend_mode_int()
-        self.has_color_key = bool(SDL_HasColorKey(self.surface))
+        try:
+            self.has_color_key = bool(SDL_HasColorKey(self.surface))
+        except NameError:
+            self.has_color_key = False
         self.has_rle = bool(SDL_HasSurfaceRLE(self.surface))
         self.must_lock = bool(SDL_MUSTLOCK(self.surface))
 
