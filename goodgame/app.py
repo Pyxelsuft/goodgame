@@ -26,7 +26,6 @@ try:
 except Exception as _err:
     print(f'Failed to import SDL2_ttf [{_err}]. Font loading and rendering will be disabled!')
 
-# TODO: simplify this
 try:
     SDL_TEXTEDITING_EXT = SDL_TEXTEDITING_EXT
 except NameError:
