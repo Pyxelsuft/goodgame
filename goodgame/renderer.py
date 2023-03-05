@@ -96,6 +96,7 @@ class Renderer:
             self.backend.backend_id,
             SDL_RENDERER_ACCELERATED | SDL_RENDERER_TARGETTEXTURE | (SDL_RENDERER_PRESENTVSYNC if vsync else 0)
         )
+        self.integer_scale = bool(SDL_RenderGetIntegerScale(self.renderer))
         self.render_target_supported = bool(SDL_RenderTargetSupported(self.renderer))
         self.destroyed = False
         # TODO:
@@ -159,10 +160,8 @@ class Renderer:
         return w_ptr, h_ptr
 
     def set_integer_scale(self, enabled: bool) -> None:
+        self.integer_scale = enabled
         SDL_RenderSetIntegerScale(self.renderer, enabled)
-
-    def get_integer_scale(self) -> bool:
-        return bool(SDL_RenderGetIntegerScale(self.renderer))
 
     def set_target(self, target: any = None) -> None:
         SDL_SetRenderTarget(self.renderer, target and target.texture)
@@ -258,7 +257,7 @@ class Renderer:
             (ctypes.c_short * len(points))(*(int(point[0]) for point in points)),
             (ctypes.c_short * len(points))(*(int(point[1]) for point in points)),
             len(points), surf.surface,
-            int(offset[0]), int(offset[1])
+            int(texture_offset[0]), int(texture_offset[1])
         )
 
     def fill_polygon(self, color: any, points: any) -> None:
