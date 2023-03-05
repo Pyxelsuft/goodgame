@@ -38,6 +38,11 @@ class Loader:
 
     def load(self, to_load: any) -> any:
         pass
+    
+    def call_on_finish(self, cb: any) -> None:
+        while not self.finished:
+            pass
+        cb()
 
     def destroy(self) -> bool:
         if self.destroyed:

@@ -76,7 +76,7 @@ class Renderer(gg.Renderer):
         )
         self.loader.load = self.load_file
         self.loader.run()
-        while not self.loader.finished:  # It's better to create loading screen
+        while not self.loader.finished:  # It's better to use call_on_finish (and create a loading screen)
             continue
         self.fps_font = self.loader.result[3]
         self.fps_font.set_kerning(False)
