@@ -11,6 +11,7 @@ from .video import PixelFormat
 from .window import Window
 from .touch import TouchDevice
 from .joystick import Joystick
+from .gamecontroller import GameController
 from .sensor import Sensor
 from sdl2 import *
 
@@ -188,7 +189,7 @@ class App:
         self.destroyed = False
         # TODO:
         #  RW ops (do we need them?)
-        #  hidapi (do we need it?), game controller, haptics, gestures (do we need them?)
+        #  hidapi (do we need it?), haptics, gestures (do we need them?)
         #  pixels (palettes, etc)
         #  Custom message box
 
@@ -197,6 +198,9 @@ class App:
 
     def get_joysticks(self) -> tuple:
         return tuple(Joystick(self, _x) for _x in range(SDL_NumJoysticks()))
+
+    def get_game_controllers(self) -> tuple:
+        return tuple(GameController(self, _x) for _x in range(SDL_NumJoysticks()) if SDL_IsGameController(_x))
 
     def get_touch_devices(self) -> tuple:
         return tuple(TouchDevice(self, _x) for _x in range(SDL_GetNumTouchDevices()))

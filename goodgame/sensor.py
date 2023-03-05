@@ -44,3 +44,6 @@ class Sensor:
             SDL_SensorClose(self.sensor)
         self.destroyed = True
         return False
+
+    def __del__(self) -> None:
+        self.destroy()
