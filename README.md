@@ -9,4 +9,4 @@ TODO, but you can see examples and code itself
 # Examples
 [test](main.py)
 # TODO
- - See [here](https://github.com/Pixelsuft/goodgame/search?q=TODO&type=)
+ - See [here](https://github.com/Pyxelsuft/goodgame/search?q=TODO&type=)
