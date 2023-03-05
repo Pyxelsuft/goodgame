@@ -8,7 +8,7 @@ Note, you may use `python3` instead of `python`
 # Docs
 TODO, but you can see examples and code itself
 # Standards
- - time: seconds (float)
+ - time: seconds (int or float)
  - rect / point: array (int or float)
  - color: array (int or float)
 # Examples
