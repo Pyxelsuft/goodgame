@@ -145,6 +145,7 @@ class Joystick:
         if self.destroyed:
             return True
         if self.opened:
+            self.opened = False
             SDL_JoystickClose(self.joystick)
         self.destroyed = True
         return False

@@ -164,7 +164,7 @@ class ControllerSensorEvent(CommonEvent):
         self.sensor = event.sensor
         self.pos = (event.x, event.y)
         self.data = (event.data[0], event.data[1], event.data[2])
-        self.time = event.timestamp_us / 1  # TODO: convert to seconds
+        self.time = event.timestamp_us / 1000000
 
 
 class AudioDeviceEvent(CommonEvent):
