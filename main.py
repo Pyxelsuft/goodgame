@@ -41,6 +41,8 @@ class Window(gg.Window):
 
     def on_mouse_down(self, event: gg.MouseButtonEvent) -> None:
         if event.button == 0:
+            if event.pos[0] <= 100 and event.pos[1] <= 50:
+                self.renderer.set_vsync(not self.renderer.vsync)
             self.renderer.circle_pos = event.pos
             self.renderer.circle_animation.reset()
             self.renderer.circle_animation.run()
