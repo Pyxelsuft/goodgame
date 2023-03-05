@@ -26,18 +26,18 @@ source.exclude_dirs = tests, bin, venv, .idea, __pycache__
 
 # (list) List of exclusions using pattern matching
 # Do not prefix with './'
-#source.exclude_patterns = license,images/*/*.jpg
+source.exclude_patterns = setup.py
 
 # (str) Application versioning (method 1)
-version = 0.1
+# version = 0.1
 
 # (str) Application versioning (method 2)
 # version.regex = __version__ = ['"](.*)['"]
-# version.filename = %(source.dir)s/main.py
+version.filename = goodgame/__init__.py
 
 # (list) Application requirements
 # comma separated e.g. requirements = sqlite3,kivy
-requirements = python3,pysdl2,Pillow,wintheme
+requirements = python3,wintheme
 
 # (str) Custom source folders for requirements
 # Sets custom source for any requirements with recipes
