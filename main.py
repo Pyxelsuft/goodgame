@@ -43,6 +43,8 @@ class Window(gg.Window):
         if event.button == 0:
             if event.pos[0] <= 100 and event.pos[1] <= 50:
                 self.renderer.set_vsync(not self.renderer.vsync)
+            elif event.pos[0] <= 100 and event.pos[1] <= 100:
+                self.renderer.draw_rects = not self.renderer.draw_rects
             self.renderer.circle_pos = event.pos
             self.renderer.circle_animation.reset()
             self.renderer.circle_animation.run()
@@ -85,6 +87,7 @@ class Renderer(gg.Renderer):
         self.chunk.set_chunk_volume(0.25)
         self.test_tex = self.texture_from_surface(self.loader.result[0])
         self.circle_pos = (0, 0)
+        self.draw_rects = True
         self.scale_animation = gg.Animation(math.pi * 2, repeat=True, enabled=True)
         self.scale_animation.calc = lambda x: math.sin(x) / 5 + 1
         self.rotate_animation = gg.Animation(math.pi * 2, repeat=True, enabled=True)
@@ -119,8 +122,9 @@ class Renderer(gg.Renderer):
             angle=self.rotate_animation.value,
             flip_horizontal=False
         )
-        self.draw_rect((0, 255, 0), (100, 100, 100, 100))
-        self.draw_rect((255, 0, 0), (100.5, 100.5, 100, 100), 20)
+        if self.draw_rects:
+            self.draw_rect((0, 255, 0), (100, 100, 100, 100))
+            self.draw_rect((255, 0, 0), (100.5, 100.5, 100, 100), 20)
         self.set_scale((1, 1))
         if self.circle_animation.enabled:
             self.draw_circle(

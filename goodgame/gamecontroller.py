@@ -43,6 +43,12 @@ class GameController:
         # TODO:
         #  finish
 
+    def add_mappings_from_file(self, path: str) -> None:
+        SDL_GameControllerAddMappingsFromFile(self.app.stb(path))
+
+    def add_mapping(self, mapping: str) -> None:
+        SDL_GameControllerAddMapping(self.app.stb(mapping))
+
     def is_attached(self) -> bool:
         return bool(SDL_GameControllerGetAttached(self.controller))
 
