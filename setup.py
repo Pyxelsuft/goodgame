@@ -1,4 +1,6 @@
 import os
+import sys
+import shutil
 from setuptools import setup, find_packages
 from goodgame import __version__ as version
 
@@ -16,6 +18,11 @@ cwd = os.path.dirname(__file__) or os.getcwd()
 readme_content = read_file('README.md')
 license_content = read_file('LICENSE.md')
 requirements_content = read_file('requirements.txt')
+
+if 'sdist' in sys.argv or 'bdist_wheel' in sys.argv:
+    dist_path = os.path.join(cwd, 'dist')
+    if os.path.isdir(dist_path):
+        shutil.rmtree(dist_path)
 
 setup(
     name='goodgame',
