@@ -27,6 +27,8 @@ class Loader:
         self.result.clear()
 
     def run(self) -> None:
+        if self.app.platform == 'Android':
+            return self.thread()
         threading.Thread(target=self.thread).start()
 
     def thread(self) -> None:
