@@ -1,5 +1,10 @@
 # GoodGame
 A Simple API for making games
+# Installing
+```commandline
+python -m pip install goodgame
+```
+Note, you may use `python3` instead of `python`
 # Docs
 TODO, but you can see examples and code itself
 # Standards

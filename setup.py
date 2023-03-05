@@ -22,7 +22,7 @@ setup(
     author='Pixelsuft',
     url='https://github.com/Pyxelsuft/goodgame',
     project_urls={
-        'Readme': 'https://github.com/Pyxelsuft/goodgame/blob/main/README.MD',
+        'Readme': 'https://github.com/Pyxelsuft/goodgame/blob/main/README.md',
         'Issue tracker': 'https://github.com/Pyxelsuft/goodgame/issues',
     },
     version=version,
