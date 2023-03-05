@@ -1,6 +1,7 @@
 import ctypes
 from .video import Backend, BackendManager
 from .surface import Surface
+from .video import PixelFormat
 from .texture import Texture
 from .sdl import sdl_dir
 from sdl2 import *
@@ -30,6 +31,55 @@ class Renderer:
         self.backend = backend or BackendManager(self.app).get_best()
         self.vsync = vsync
         self.texture = None
+        self.format_map = {
+            'unknown': SDL_PIXELFORMAT_UNKNOWN,
+            'index1lsb': SDL_PIXELFORMAT_INDEX1LSB,
+            'index1msb': SDL_PIXELFORMAT_INDEX1MSB,
+            'index4lsb': SDL_PIXELFORMAT_INDEX4LSB,
+            'index4msb': SDL_PIXELFORMAT_INDEX4MSB,
+            'index8': SDL_PIXELFORMAT_INDEX8,
+            'rgb332': SDL_PIXELFORMAT_RGB332,
+            'rgb444': SDL_PIXELFORMAT_RGB444,
+            'rgb555': SDL_PIXELFORMAT_RGB555,
+            'bgr555': SDL_PIXELFORMAT_BGR555,
+            'argb4444': SDL_PIXELFORMAT_ARGB4444,
+            'rgba4444': SDL_PIXELFORMAT_RGBA4444,
+            'abgr4444': SDL_PIXELFORMAT_ABGR4444,
+            'bgra4444': SDL_PIXELFORMAT_BGRA4444,
+            'argb1555': SDL_PIXELFORMAT_ARGB1555,
+            'rgba5551': SDL_PIXELFORMAT_RGBA5551,
+            'abgr1555': SDL_PIXELFORMAT_ABGR1555,
+            'bgra5551': SDL_PIXELFORMAT_BGRA5551,
+            'rgb565': SDL_PIXELFORMAT_RGB565,
+            'bgr565': SDL_PIXELFORMAT_BGR565,
+            'rgb24': SDL_PIXELFORMAT_RGB24,
+            'bgr24': SDL_PIXELFORMAT_BGR24,
+            'rgb888': SDL_PIXELFORMAT_RGB888,
+            'rgbx8888': SDL_PIXELFORMAT_RGBX8888,
+            'bgr888': SDL_PIXELFORMAT_BGR888,
+            'bgrx8888': SDL_PIXELFORMAT_BGRX8888,
+            'argb8888': SDL_PIXELFORMAT_ARGB8888,
+            'rgba8888': SDL_PIXELFORMAT_RGBA8888,
+            'abgr8888': SDL_PIXELFORMAT_ABGR8888,
+            'bgra8888': SDL_PIXELFORMAT_BGRA8888,
+            'argb2101010': SDL_PIXELFORMAT_ARGB2101010,
+            'rgba32': SDL_PIXELFORMAT_RGBA32,
+            'argb32': SDL_PIXELFORMAT_ARGB32,
+            'bgra32': SDL_PIXELFORMAT_BGRA32,
+            'abgr32': SDL_PIXELFORMAT_ABGR32,
+            'yv12': SDL_PIXELFORMAT_YV12,
+            'iyuv': SDL_PIXELFORMAT_IYUV,
+            'yuy2': SDL_PIXELFORMAT_YUY2,
+            'uyvy': SDL_PIXELFORMAT_UYVY,
+            'yvyu': SDL_PIXELFORMAT_YVYU,
+            'nv12': SDL_PIXELFORMAT_NV12,
+            'nv21': SDL_PIXELFORMAT_NV21
+        }
+        self.access_map = {
+            'static': SDL_TEXTUREACCESS_STATIC,
+            'target': SDL_TEXTUREACCESS_TARGET,
+            'streaming': SDL_TEXTUREACCESS_STREAMING
+        }
         if force_int or 'SDL_RenderCopyF' not in sdl_dir:
             self.blit = self.blit_i
             self.blit_ex = self.blit_ex_i
@@ -52,6 +102,9 @@ class Renderer:
         #  check out of bounds (check if this handled automatic by sdl)
         #  SDL_RenderReadPixels, SDL_RenderGeometry, SDL_RenderGeometryRaw
         #  Fix Scaling for SDL2_gfx
+
+    def pixel_format_from_str(self, format_str: str) -> PixelFormat:
+        return PixelFormat(self.format_map[format_str], self.app)
 
     def window_to_logical(self, pos: any) -> tuple:
         w_ptr, h_ptr = ctypes.c_float(), ctypes.c_float()
@@ -97,16 +150,31 @@ class Renderer:
         SDL_RenderGetViewport(self.renderer, viewport_ptr)
         return viewport_ptr.x, viewport_ptr.y, viewport_ptr.w, viewport_ptr.h
 
-    def set_logical_size(self, size: any) -> None:
-        SDL_RenderSetLogicalSize(self.renderer, int(size[0]), int(size[1]))
+    def set_logical_size(self, logical_size: any) -> None:
+        SDL_RenderSetLogicalSize(self.renderer, int(logical_size[0]), int(logical_size[1]))
 
-    def get_logical_size(self, size: any) -> tuple:
+    def get_logical_size(self) -> tuple:
         w_ptr, h_ptr = ctypes.c_int(), ctypes.c_int()
         SDL_RenderGetLogicalSize(self.renderer, w_ptr, h_ptr)
         return w_ptr, h_ptr
 
+    def set_integer_scale(self, enabled: bool) -> None:
+        SDL_RenderSetIntegerScale(self.renderer, enabled)
+
+    def get_integer_scale(self) -> bool:
+        return bool(SDL_RenderGetIntegerScale(self.renderer))
+
     def set_target(self, target: any = None) -> None:
         SDL_SetRenderTarget(self.renderer, target and target.texture)
+
+    def create_texture(
+            self,
+            texture_size: any,
+            pixel_format: PixelFormat,
+            access: str = 'target'
+    ) -> Texture:
+        return Texture(SDL_CreateTexture(self.renderer, pixel_format.pixel_format, self.access_map[access],
+                                         int(texture_size[0]), int(texture_size[1])), self)
 
     def texture_from_file(self, path: str) -> Texture:
         texture = IMG_LoadTexture(self.renderer, self.app.stb(path))
@@ -167,12 +235,13 @@ class Renderer:
     def texture_from_surface(self, surf: Surface) -> Texture:
         return Texture(SDL_CreateTextureFromSurface(self.renderer, surf.surface), self)
 
-    def draw_bezier(self, color: any, points: any, s: float) -> None:
+    def draw_bezier(self, color: any, points: any, steps: float) -> None:
         bezierRGBA(
             self.renderer,
             (ctypes.c_short * len(points))(*(int(point[0]) for point in points)),
             (ctypes.c_short * len(points))(*(int(point[1]) for point in points)),
-            len(points), int(s), int(color[0]), int(color[1]), int(color[2]), int(color[3]) if len(color) > 3 else 255
+            len(points), int(steps),
+            int(color[0]), int(color[1]), int(color[2]), int(color[3]) if len(color) > 3 else 255
         )
 
     def draw_polygon(self, color: any, points: any, aa: bool = False) -> None:
@@ -183,7 +252,7 @@ class Renderer:
             len(points), int(color[0]), int(color[1]), int(color[2]), int(color[3]) if len(color) > 3 else 255
         )
 
-    def draw_textured_polygon(self, points: any, surf: Surface, offset: any = (0, 0)) -> None:
+    def draw_textured_polygon(self, points: any, surf: Surface, texture_offset: any = (0, 0)) -> None:
         texturedPolygon(
             self.renderer,
             (ctypes.c_short * len(points))(*(int(point[0]) for point in points)),

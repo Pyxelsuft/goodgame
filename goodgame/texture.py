@@ -9,7 +9,6 @@ class Texture:
         if not texture:
             renderer.app.raise_error()
         self.app = renderer.app
-        self.renderer = renderer
         self.texture = texture
         self.scale_mode = self.get_scale_mode()
         self.color_mod = self.get_color_mod()
@@ -30,12 +29,6 @@ class Texture:
         if scale_mode_ptr.value == SDL_ScaleModeLinear:
             return 'linear'
         return 'unknown'
-
-    def set_integer_scale(self, enabled: bool) -> None:
-        SDL_RenderSetIntegerScale(self.renderer, enabled)
-
-    def get_integer_scale(self) -> bool:
-        return bool(SDL_RenderGetIntegerScale(self.renderer))
 
     def set_scale_mode(self, scale_mode: str) -> None:
         if scale_mode == 'best':
@@ -157,7 +150,6 @@ class Texture:
             return True
         SDL_DestroyTexture(self.texture)
         self.destroyed = True
-        del self.renderer
         del self.app
         return False
 
