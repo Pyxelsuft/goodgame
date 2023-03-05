@@ -32,7 +32,7 @@ source.exclude_patterns = setup.py
 # version = 0.1
 
 # (str) Application versioning (method 2)
-# version.regex = __version__ = ['"](.*)['"]
+version.regex = __version__ = ['"](.*)['"]
 version.filename = goodgame/__init__.py
 
 # (list) Application requirements
