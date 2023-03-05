@@ -23,7 +23,8 @@ setup(
     url='https://github.com/Pyxelsuft/goodgame',
     project_urls={
         'Readme': 'https://github.com/Pyxelsuft/goodgame/blob/main/README.md',
-        'Issue tracker': 'https://github.com/Pyxelsuft/goodgame/issues',
+        'Documentation': 'https://github.com/Pyxelsuft/goodgame/tree/main/docs',
+        'Issue tracker': 'https://github.com/Pyxelsuft/goodgame/issues'
     },
     version=version,
     packages=find_packages(),

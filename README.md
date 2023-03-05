@@ -5,12 +5,8 @@ A Simple API for making games
 python -m pip install goodgame
 ```
 Note, you may use `python3` instead of `python`
-# Docs
-TODO, but you can see examples and code itself
-# Standards
- - time: seconds (int or float)
- - rect / point: array (int or float)
- - color: array (int or float)
+# Documentation
+ - See [here](https://github.com/Pyxelsuft/goodgame/tree/main/docs)
 # Examples
 [test](main.py)
 # TODO
