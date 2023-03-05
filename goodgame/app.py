@@ -38,12 +38,10 @@ except NameError:
 try:
     SDL_LOCALECHANGED = SDL_LOCALECHANGED
     SDL_KEYMAPCHANGED = SDL_KEYMAPCHANGED
+    SDL_CLIPBOARDUPDATE = SDL_CLIPBOARDUPDATE
 except NameError:
     SDL_LOCALECHANGED = 0x107
     SDL_KEYMAPCHANGED = 0x304
-try:
-    SDL_CLIPBOARDUPDATE = SDL_CLIPBOARDUPDATE
-except NameError:
     SDL_CLIPBOARDUPDATE = 0x900
 try:
     SDL_JOYBATTERYUPDATED = SDL_JOYBATTERYUPDATED
@@ -65,19 +63,15 @@ except NameError:
     SDL_INIT_SENSOR = 0x00008000
 try:
     IMG_INIT_JXL = IMG_INIT_JXL
-except NameError:
-    IMG_INIT_JXL = 0x00000010
-try:
     IMG_INIT_AVIF = IMG_INIT_AVIF
 except NameError:
+    IMG_INIT_JXL = 0x00000010
     IMG_INIT_AVIF = 0x00000020
 try:
     MIX_INIT_MID = MIX_INIT_MID
-except NameError:
-    MIX_INIT_MID = 0x00000020
-try:
     MIX_INIT_OPUS = MIX_INIT_OPUS
 except NameError:
+    MIX_INIT_MID = 0x00000020
     MIX_INIT_OPUS = 0x00000040
 
 
@@ -171,6 +165,18 @@ class App:
             SDL_CONTROLLERDEVICEREMAPPED: lambda: self.on_controller_device_remap(
                 ControllerDeviceEvent(self.sdl_event.cdevice)
             ),
+            SDL_CONTROLLERTOUCHPADDOWN: lambda: self.on_controller_touchpad_down(
+                ControllerTouchpadEvent(self.sdl_event.cdevice)
+            ),
+            SDL_CONTROLLERTOUCHPADMOTION: lambda: self.on_controller_touchpad_move(
+                ControllerTouchpadEvent(self.sdl_event.cdevice)
+            ),
+            SDL_CONTROLLERTOUCHPADUP: lambda: self.on_controller_touchpad_up(
+                ControllerTouchpadEvent(self.sdl_event.cdevice)
+            ),
+            SDL_CONTROLLERSENSORUPDATE: lambda: self.on_controller_sensor_update(
+                ControllerSensorEvent(self.sdl_event.cdevice)
+            )
         }
         self.windows = {}
         self.running = False
@@ -182,7 +188,7 @@ class App:
         self.destroyed = False
         # TODO:
         #  RW ops (do we need them?)
-        #  hidapi (do we need it?), joysticks, haptics, sensors, gestures (do we need them?)
+        #  hidapi (do we need it?), haptics, sensors, gestures (do we need them?)
         #  pixels (palettes, etc)
         #  Custom message box
 
@@ -710,6 +716,18 @@ class App:
         pass
 
     def on_controller_device_remap(self, event: ControllerDeviceEvent) -> None:
+        pass
+
+    def on_controller_touchpad_down(self, event: ControllerTouchpadEvent) -> None:
+        pass
+
+    def on_controller_touchpad_move(self, event: ControllerTouchpadEvent) -> None:
+        pass
+
+    def on_controller_touchpad_up(self, event: ControllerTouchpadEvent) -> None:
+        pass
+
+    def on_controller_sensor_update(self, event: ControllerSensorEvent) -> None:
         pass
 
     def __del__(self) -> None:
