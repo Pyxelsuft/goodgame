@@ -295,7 +295,7 @@ class Window:
     def on_drop_complete(self, event: DropEvent) -> None:
         pass
 
-    def on_finger_motion(self, event: TouchFingerEvent) -> None:
+    def on_finger_move(self, event: TouchFingerEvent) -> None:
         pass
 
     def on_finger_down(self, event: TouchFingerEvent) -> None:
