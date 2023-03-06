@@ -15,9 +15,9 @@ else:
 
 
 class Math:
-    def __init__(self) -> None:
+    def __init__(self, force_int: bool = False) -> None:
         self.destroyed = True
-        if 'SDL_HasIntersectionF' not in sdl_dir:
+        if force_int or 'SDL_HasIntersectionF' not in sdl_dir:
             self.has_intersection = self.has_intersection_i
             self.intersect = self.intersect_i
             self.union = self.union_i
