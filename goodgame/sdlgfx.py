@@ -684,7 +684,7 @@ def aaellipseRGBA(renderer: SDL_Renderer, x: int, y: int, rx: int, ry: int, r: i
 
 
 def filledEllipseRGBA(renderer: SDL_Renderer, x: int, y: int, rx: int, ry: int, r: int, g: int, b: int, a: int) -> int:
-    return _ellipseRGBA(renderer, x, y, rx, ry, r, g, b, a, 0)
+    return _ellipseRGBA(renderer, x, y, rx, ry, r, g, b, a, 1)
 
 
 def _pieRGBA(
