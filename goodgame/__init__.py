@@ -22,4 +22,4 @@ from .loader import Loader
 from .math import Math
 
 
-__version__ = '0.0.5'
+__version__ = '0.0.6'

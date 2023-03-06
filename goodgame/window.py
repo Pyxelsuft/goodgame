@@ -26,12 +26,12 @@ class Window:
     ) -> None:
         self.destroyed = True
         self.app = app
-        self.x, self.y = pos or (SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED)
-        self.w, self.h = size
+        self.pos = pos or (SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED)
+        self.size = size
         self.window = SDL_CreateWindow(
             app.stb('Good Window'),
-            self.x, self.y,
-            self.w, self.h,
+            int(self.pos[0]), int(self.pos[1]),
+            int(self.size[0]), int(self.size[1]),
             SDL_WINDOW_ALLOW_HIGHDPI | SDL_WINDOW_HIDDEN | (SDL_WINDOW_UTILITY if window_type == 'utility' else (
                 SDL_WINDOW_TOOLTIP if window_type == 'tooltip' else (
                     SDL_WINDOW_POPUP_MENU if window_type == 'popup_menu' else 0
@@ -200,12 +200,12 @@ class Window:
     def update_pos(self) -> None:
         x_ptr, y_ptr = ctypes.c_int(), ctypes.c_int()
         SDL_GetWindowPosition(self.window, x_ptr, y_ptr)
-        self.x, self.y = x_ptr.value, y_ptr.value
+        self.pos = x_ptr.value, y_ptr.value
 
     def update_size(self) -> None:
         w_ptr, h_ptr = ctypes.c_int(), ctypes.c_int()
         SDL_GetWindowSize(self.window, w_ptr, h_ptr)
-        self.w, self.h = w_ptr.value, h_ptr.value
+        self.size = w_ptr.value, h_ptr.value
 
     def set_pos(self, pos: any) -> None:
         if not pos:
@@ -217,14 +217,14 @@ class Window:
         SDL_SetWindowSize(self.window, size[0], size[1])
         self.update_size()
 
-    def set_min_size(self, w: int, h: int) -> None:
-        self.min_size = (w, h)
-        SDL_SetWindowMinimumSize(self.window, w, h)
+    def set_min_size(self, min_size: any) -> None:
+        self.min_size = min_size
+        SDL_SetWindowMinimumSize(self.window, int(min_size[0]), int(min_size[1]))
         self.update_size()
 
-    def set_max_size(self, w: int, h: int) -> None:
-        self.max_size = (w, h)
-        SDL_SetWindowMaximumSize(self.window, w, h)
+    def set_max_size(self, max_size: any) -> None:
+        self.max_size = max_size
+        SDL_SetWindowMaximumSize(self.window, int(max_size[0]), int(max_size[1]))
         self.update_size()
 
     def set_window_mode(self, mode: str = 'windowed') -> None:
@@ -341,13 +341,13 @@ class Window:
         self.update_flags()
 
     def on_move(self, event: WindowEvent) -> None:
-        self.x, self.y = event.data1, event.data2
+        self.pos = event.data1, event.data2
 
     def on_resize(self, event: WindowEvent) -> None:
-        self.w, self.h = event.data1, event.data2
+        self.size = event.data1, event.data2
 
     def on_size_change(self, event: WindowEvent) -> None:
-        self.w, self.h = event.data1, event.data2
+        self.size = event.data1, event.data2
 
     def on_minimize(self, event: WindowEvent) -> None:
         self.update_flags()

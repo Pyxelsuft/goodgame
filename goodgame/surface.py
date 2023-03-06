@@ -23,6 +23,7 @@ class Surface:
         self.surface = surf
         self.format = PixelFormat(surf.contents.format.contents.format, app)
         self.w, self.h = surf.contents.w, surf.contents.h
+        self.size = self.w, self.h
         self.clip_rect = (
             surf.contents.clip_rect.x, surf.contents.clip_rect.y,
             surf.contents.clip_rect.w, surf.contents.clip_rect.h
@@ -217,7 +218,7 @@ class SurfaceAnimation:
     def __init__(self, animation: IMG_Animation, app: any) -> None:
         self.destroyed = True
         self.animation = animation
-        self.w, self.h = animation.w, animation.h
+        self.size = animation.w, animation.h
         self.surfaces = tuple(Surface(animation.frames[_x], app) for _x in range(animation.count))
         self.delays = tuple(animation.delays[_x] for _x in range(animation.count))
         self.destroyed = False
