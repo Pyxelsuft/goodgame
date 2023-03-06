@@ -210,11 +210,11 @@ class Window:
     def set_pos(self, pos: any) -> None:
         if not pos:
             pos = (SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED)
-        SDL_SetWindowPosition(self.window, pos[0], pos[1])
+        SDL_SetWindowPosition(self.window, int(pos[0]), int(pos[1]))
         self.update_pos()
 
     def set_size(self, size: any) -> None:
-        SDL_SetWindowSize(self.window, size[0], size[1])
+        SDL_SetWindowSize(self.window, int(size[0]), int(size[1]))
         self.update_size()
 
     def set_min_size(self, min_size: any) -> None:
