@@ -439,7 +439,10 @@ class TTF:
     def destroy(self) -> bool:
         if self.destroyed:
             return True
-        TTF_CloseFont(self.font)
+        try:
+            TTF_CloseFont(self.font)
+        except OSError:
+            print(f'Failed to close font {self}')
         del self.app
         self.destroyed = True
         return False
