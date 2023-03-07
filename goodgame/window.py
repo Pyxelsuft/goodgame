@@ -3,6 +3,7 @@ from .events import DropEvent, TouchFingerEvent, KeyboardEvent, MouseMotionEvent
     TextEditingEvent, TextInputEvent, WindowEvent, default_window_id
 from .video import DisplayMode, PixelFormat
 from .surface import Surface
+from .opengl import GLContext
 from sdl2 import *
 
 try:
@@ -22,7 +23,8 @@ class Window:
             pos: any = None,
             size: any = (640, 480),
             skip_taskbar: bool = False,
-            window_type: str = None
+            window_type: str = None,
+            context: str = None
     ) -> None:
         self.destroyed = True
         self.app = app
@@ -36,7 +38,8 @@ class Window:
                 SDL_WINDOW_TOOLTIP if window_type == 'tooltip' else (
                     SDL_WINDOW_POPUP_MENU if window_type == 'popup_menu' else 0
                 )
-            )) | (SDL_WINDOW_SKIP_TASKBAR if skip_taskbar else 0)
+            )) | (SDL_WINDOW_SKIP_TASKBAR if skip_taskbar else 0) | (SDL_WINDOW_OPENGL if context == 'opengl' else 0) |
+            (SDL_WINDOW_VULKAN if context == 'vulkan' else 0)
         )
         if not self.window:
             app.raise_error()
@@ -86,7 +89,11 @@ class Window:
         app.windows[self.id] = self
         self.destroyed = False
         # TODO:
+        #  support creating contexts
         #  gamma ramp, hit test (maybe no?) and other spec. things
+
+    def create_gl_context(self) -> GLContext:
+        return GLContext(self, SDL_GL_CreateContext(self.window))
 
     @staticmethod
     def get_mouse_buttons() -> tuple:

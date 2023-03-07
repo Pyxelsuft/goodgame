@@ -20,6 +20,7 @@ from .mixer import Mixer, Music, Chunk
 from .ttf import TTF
 from .loader import Loader
 from .math import Math
+from .opengl import GLContext
 
 
-__version__ = '0.0.8'
+__version__ = '0.0.9'
