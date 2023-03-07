@@ -89,7 +89,6 @@ class Window:
         app.windows[self.id] = self
         self.destroyed = False
         # TODO:
-        #  support creating contexts
         #  gamma ramp, hit test (maybe no?) and other spec. things
 
     def create_gl_context(self) -> GLContext:
