@@ -122,23 +122,23 @@ class Math:
         ))
 
     @staticmethod
-    @numba.jit(nopython=True, fastmath=True)
+    @numba.njit(nopython=True, fastmath=True)
     def point_in_rect(r: any, p: any) -> bool:
         return r[0] <= p[0] < r[0] + r[2] and r[1] <= p[1] < r[1] + r[3]
 
     @staticmethod
-    @numba.jit(nopython=True, fastmath=True)
+    @numba.njit(nopython=True, fastmath=True)
     def rect_empty(r: any) -> bool:
         return r[0] <= 0 or r[1] <= 0
 
     @staticmethod
-    @numba.jit(nopython=True, fastmath=True)
+    @numba.njit(nopython=True, fastmath=True)
     def rect_equals(a: any, b: any, epsilon: float = sys.float_info.epsilon) -> bool:
         return abs(a[0] - b[0]) <= epsilon and abs(a[1] - b[1]) <= epsilon and\
             abs(a[2] - b[2]) <= epsilon and abs(a[3] - b[3]) <= epsilon
 
     @staticmethod
-    @numba.jit(nopython=True, fastmath=True)
+    @numba.njit(nopython=True, fastmath=True)
     def rect_equals_i(a: any, b: any) -> bool:
         return int(a[0]) == int(b[0]) and int(a[1]) == int(b[1]) and int(a[2]) == int(b[2]) and int(a[3]) == int(b[3])
 
