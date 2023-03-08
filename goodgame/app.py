@@ -188,6 +188,7 @@ class App:
         self.sdl_event = SDL_Event()
         self.destroyed = False
         # TODO:
+        #  handle more errors
         #  RW ops (do we need them?)
         #  hidapi (do we need it?), haptics, gestures (do we need them?)
         #  pixels (palettes, etc)
