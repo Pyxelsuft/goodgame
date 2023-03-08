@@ -13,6 +13,8 @@ class GLContext:
             'context_profile_core': SDL_GL_CONTEXT_PROFILE_CORE
         }
         self.destroyed = False
+        # TODO:
+        #  finish
 
     def swap_window(self) -> None:
         SDL_GL_SwapWindow(self.window.window)
