@@ -98,11 +98,37 @@ class Renderer:
         )
         self.integer_scale = bool(SDL_RenderGetIntegerScale(self.renderer))
         self.render_target_supported = bool(SDL_RenderTargetSupported(self.renderer))
+        self.target = None
         self.destroyed = False
         # TODO:
         #  check out of bounds (check if this handled automatic by sdl)
         #  SDL_RenderReadPixels, SDL_RenderGeometry, SDL_RenderGeometryRaw
         #  Fix Scaling for SDL2_gfx
+
+    def crop_texture(self, texture: Texture, crop_rect: any) -> Texture:
+        bak_target = self.target
+        result = self.create_texture(
+            (crop_rect[2], crop_rect[3]),
+            texture.get_format()
+        )
+        self.set_target(result)
+        self.blit(texture, src_rect=crop_rect)
+        self.set_target(bak_target)
+        return result
+
+    def scale_texture_size(self, texture: Texture, size: any) -> Texture:
+        bak_target = self.target
+        result = self.create_texture(
+            size,
+            texture.get_format()
+        )
+        self.set_target(result)
+        self.blit(texture)
+        self.set_target(bak_target)
+        return result
+
+    def scale_texture(self, texture: Texture, scale: any) -> Texture:
+        return self.scale_texture_size(texture, (scale[0] * texture.get_w(), scale[1] * texture.get_h()))
 
     def pixel_format_from_str(self, format_str: str) -> PixelFormat:
         return PixelFormat(self.format_map[format_str], self.app)
@@ -164,6 +190,7 @@ class Renderer:
         SDL_RenderSetIntegerScale(self.renderer, enabled)
 
     def set_target(self, target: any = None) -> None:
+        self.target = target
         SDL_SetRenderTarget(self.renderer, target and target.texture)
 
     def create_texture(
@@ -185,7 +212,7 @@ class Renderer:
         SDL_RenderCopyF(
             self.renderer,
             texture.texture,
-            src_rect and SDL_FRect(src_rect[0], src_rect[1], src_rect[2], src_rect[3]),
+            src_rect and SDL_Rect(int(src_rect[0]), int(src_rect[1]), int(src_rect[2]), int(src_rect[3])),
             dst_rect and (SDL_FRect(dst_rect[0], dst_rect[1], dst_rect[2], dst_rect[3]) if len(dst_rect) > 2 else
                           SDL_FRect(dst_rect[0], dst_rect[1], texture.get_w(), texture.get_h()))
         )
@@ -207,7 +234,7 @@ class Renderer:
         SDL_RenderCopyExF(
             self.renderer,
             texture.texture,
-            src_rect and SDL_FRect(src_rect[0], src_rect[1], src_rect[2], src_rect[3]),
+            src_rect and SDL_Rect(int(src_rect[0]), int(src_rect[1]), int(src_rect[2]), int(src_rect[3])),
             dst_rect and (SDL_FRect(dst_rect[0], dst_rect[1], dst_rect[2], dst_rect[3]) if len(dst_rect) > 2 else
                           SDL_FRect(dst_rect[0], dst_rect[1], texture.get_w(), texture.get_h())),
             angle,
@@ -568,7 +595,6 @@ class Renderer:
     def destroy(self) -> bool:
         if self.destroyed:
             return True
-        SDL_DestroyRenderer(self.renderer)
         self.destroyed = True
         self.blit = None
         self.blit_ex = None
@@ -580,6 +606,8 @@ class Renderer:
         self.sdl_fill_rects = None
         self.sdl_draw_line = None
         self.sdl_draw_lines = None
+        self.target = None
+        SDL_DestroyRenderer(self.renderer)
         del self.window
         del self.app
         return False
