@@ -68,6 +68,7 @@ class Renderer(gg.Renderer):
         self.loader = gg.Loader(
             self.app,
             [
+                ('bmp', self.app.p('example_files', 'gradient.bmp')),
                 ('image', self.app.p('example_files', 'img.png')),
                 ('music', self.app.p('example_files', 'music.mp3')),
                 ('sound', self.app.p('example_files', 'click.ogg')),
@@ -78,16 +79,16 @@ class Renderer(gg.Renderer):
         self.loader.run()
         while not self.loader.finished:  # It's better to use call_on_finish (and create a loading screen)
             continue
-        self.fps_font = self.loader.result[3]
+        self.fps_font = self.loader.result[4]
         self.fps_font.set_kerning(False)
-        self.music = self.loader.result[1]
+        self.bg = self.texture_from_surface(self.loader.result[0])
+        self.bg.set_scale_mode('linear')
+        self.music = self.loader.result[2]
         self.music.set_volume(0.1)
         self.music.play(-1)
-        self.chunk = self.loader.result[2]
-        self.bg = self.texture_from_file('example_files/gr.bmp')
-        self.bg.set_scale_mode('linear')
+        self.chunk = self.loader.result[3]
         self.chunk.set_chunk_volume(0.25)
-        self.test_tex = self.texture_from_surface(self.loader.result[0])
+        self.test_tex = self.texture_from_surface(self.loader.result[1])
         self.circle_pos = (0, 0)
         self.draw_rects = True
         self.scale_animation = gg.Animation(math.pi * 2, repeat=True, enabled=True)
@@ -103,6 +104,8 @@ class Renderer(gg.Renderer):
     def load_file(self, to_load: tuple) -> any:
         if to_load[0] == 'image':
             return self.app.surface_from_file(to_load[1])
+        elif to_load[0] == 'bmp':
+            return self.app.surface_from_bmp(to_load[1])
         elif to_load[0] == 'music':
             return gg.Music(self.mixer, to_load[1])
         elif to_load[0] == 'sound':
