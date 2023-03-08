@@ -85,7 +85,7 @@ class Renderer(gg.Renderer):
         self.music.play(-1)
         self.chunk = self.loader.result[2]
         self.chunk.set_chunk_volume(0.25)
-        self.test_tex = self.texture_from_surface(self.loader.result[0]), (20, 20, 320, 200)
+        self.test_tex = self.texture_from_surface(self.loader.result[0])
         self.circle_pos = (0, 0)
         self.draw_rects = True
         self.scale_animation = gg.Animation(math.pi * 2, repeat=True, enabled=True)
