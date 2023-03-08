@@ -1,6 +1,6 @@
 from .exceptions import FlagNotFoundError, SDLError
 from .app import App
-from .clock import Clock, Timer, Animation
+from .clock import Clock, Timer, Animation, Counter
 from .events import CommonEvent, QuitEvent, AudioDeviceEvent, DropEvent, TouchFingerEvent, KeyboardEvent,\
     MouseMotionEvent, MouseButtonEvent, MouseWheelEvent, TextEditingEvent, TextInputEvent, DisplayEvent, WindowEvent,\
     JoyAxisEvent, JoyBallEvent, JoyButtonEvent, JoyDeviceEvent, JoyHatEvent, JoyBatteryEvent, ControllerAxisEvent,\

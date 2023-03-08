@@ -126,3 +126,42 @@ class Animation:
     @staticmethod
     def calc(counter: float) -> any:
         return counter
+
+
+class Counter:
+    def __init__(
+            self,
+            duration: float,
+            repeat: bool = True,
+            enabled: bool = False,
+            smooth: bool = False
+    ) -> None:
+        self.duration = duration
+        self.repeat = repeat
+        self.enabled = enabled
+        self.counter = 0.0
+        self.smooth = smooth
+
+    def reset(self) -> None:
+        self.counter = 0.0
+
+    def run(self) -> None:
+        self.enabled = True
+
+    def pause(self) -> None:
+        self.enabled = False
+
+    def stop(self) -> None:
+        self.pause()
+        self.reset()
+
+    def tick(self, dt: float) -> None:
+        if not self.enabled:
+            return
+        self.counter += dt
+        if self.smooth:
+            if self.counter >= self.duration:
+                self.counter -= self.duration
+            return
+        while self.counter >= self.duration:
+            self.counter -= self.duration
