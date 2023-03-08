@@ -84,6 +84,8 @@ class Renderer(gg.Renderer):
         self.music.set_volume(0.1)
         self.music.play(-1)
         self.chunk = self.loader.result[2]
+        self.bg = self.texture_from_file('example_files/gr.bmp')
+        self.bg.set_scale_mode('linear')
         self.chunk.set_chunk_volume(0.25)
         self.test_tex = self.texture_from_surface(self.loader.result[0])
         self.circle_pos = (0, 0)
@@ -115,7 +117,7 @@ class Renderer(gg.Renderer):
         self.circle_animation.tick(dt)
         self.set_scale((self.scale_animation.value, self.scale_animation.value))
         # self.fps_font.set_scale((self.scale_animation.value, self.scale_animation.value))
-        self.clear()
+        self.blit(self.bg)
         self.blit_ex(
             self.test_tex,
             dst_rect=(80, 100),
