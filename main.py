@@ -36,6 +36,7 @@ class Window(gg.Window):
         super().__init__(app, size=size)
         self.app: App = self.app
         self.emulate_mouse_with_touch = True
+        self.set_resizable(True)
         wintheme.set_window_theme(self.get_hwnd(), wintheme.THEME_DARK)
         self.renderer = Renderer(self)
 
@@ -72,7 +73,8 @@ class Renderer(gg.Renderer):
                 ('image', self.app.p('example_files', 'img.png')),
                 ('music', self.app.p('example_files', 'music.mp3')),
                 ('sound', self.app.p('example_files', 'click.ogg')),
-                ('font', self.app.p('example_files', 'segoeuib.ttf'), 50)
+                ('font', self.app.p('example_files', 'segoeuib.ttf'), 50),
+                ('text', self.app.p('example_files', 'goldFont-hd.fnt'))
             ]
         )
         self.loader.load = self.load_file
@@ -89,6 +91,7 @@ class Renderer(gg.Renderer):
         self.chunk = self.loader.result[3]
         self.chunk.set_chunk_volume(0.25)
         self.test_tex = self.texture_from_surface(self.loader.result[1])
+        self.bm_font = gg.BMFont(self.loader.result[5])
         self.circle_pos = (0, 0)
         self.draw_rects = True
         self.scale_animation = gg.Animation(math.pi * 2, repeat=True, enabled=True)
@@ -112,6 +115,8 @@ class Renderer(gg.Renderer):
             return gg.Chunk(self.mixer, to_load[1])
         elif to_load[0] == 'font':
             return gg.TTF(self.app, to_load[1], to_load[2])
+        elif to_load[0] == 'text':
+            return open(to_load[1], 'r', encoding=self.app.encoding).read()
 
     def update(self) -> None:
         dt = self.app.clock.delta * (10 if self.app.get_key_state('2') else 1)
