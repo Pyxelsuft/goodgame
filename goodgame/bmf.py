@@ -64,7 +64,8 @@ class BMFont:
         self.data = self.parse()
         self.parse_data()
         self.destroyed = False
-        # TODO: finish
+        # TODO:
+        #  render lines (including split by width, wrap align, etc)
 
     def render(self, word: str) -> Texture:
         cur_x = 0
