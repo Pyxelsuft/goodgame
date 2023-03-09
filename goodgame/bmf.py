@@ -94,7 +94,7 @@ class BMFont:
                 self.num_chars = data[1]['count']
             elif data[0] == 'char':
                 bm_char = BMChar(self.renderer, data[1], self.pages[data[1]['page']])
-                if data[1]['letter'] == 'space':
+                if bm_char.letter == 'space':
                     self.chars[' '] = bm_char
                 else:
                     self.chars[bm_char.letter] = bm_char
