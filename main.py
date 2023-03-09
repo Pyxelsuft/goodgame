@@ -74,7 +74,8 @@ class Renderer(gg.Renderer):
                 ('music', self.app.p('example_files', 'music.mp3')),
                 ('sound', self.app.p('example_files', 'click.ogg')),
                 ('font', self.app.p('example_files', 'segoeuib.ttf'), 50),
-                ('text', self.app.p('example_files', 'goldFont-hd.fnt'))
+                ('text', self.app.p('example_files', 'goldFont-hd.fnt')),
+                ('image', self.app.p('example_files', 'goldFont-hd.png'))
             ]
         )
         self.loader.load = self.load_file
@@ -91,7 +92,11 @@ class Renderer(gg.Renderer):
         self.chunk = self.loader.result[3]
         self.chunk.set_chunk_volume(0.25)
         self.test_tex = self.texture_from_surface(self.loader.result[1])
-        self.bm_font = gg.BMFont(self.loader.result[5])
+        bm_tex = self.texture_from_surface(self.loader.result[6])
+        bm_tex.set_scale_mode('linear')
+        self.bm_font = gg.BMFont(self, self.loader.result[5], {
+            'goldFont-hd.png': bm_tex
+        })
         self.circle_pos = (0, 0)
         self.draw_rects = True
         self.scale_animation = gg.Animation(math.pi * 2, repeat=True, enabled=True)
@@ -135,6 +140,13 @@ class Renderer(gg.Renderer):
         if self.draw_rects:
             self.draw_rect((0, 255, 0), (100, 100, 100, 100))
             self.draw_rect((255, 0, 0), (100.5, 100.5, 100, 100), 20)
+        tex = self.bm_font.render_word('Hello_Bruh!'.upper())
+        tex.set_scale_mode('linear')
+        self.blit(tex, dst_rect=(200, 200))
+        # char = 'R'
+        # self.bm_font.chars[char].texture.set_blend_mode('none')
+        # self.blit(self.bm_font.chars[char].texture, dst_rect=(200, 200))
+        # self.draw_rect((255, 0, 0), (200, 200, *self.bm_font.chars['j'].texture.get_size()))
         self.set_scale((1, 1))
         if self.circle_animation.enabled:
             self.draw_circle(

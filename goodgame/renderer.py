@@ -104,6 +104,7 @@ class Renderer:
         #  check out of bounds (check if this handled automatic by sdl)
         #  SDL_RenderReadPixels, SDL_RenderGeometry, SDL_RenderGeometryRaw
         #  Fix Scaling for SDL2_gfx
+        #  copy_attributes function
 
     def crop_texture(self, texture: Texture, crop_rect: any) -> Texture:
         bak_target = self.target

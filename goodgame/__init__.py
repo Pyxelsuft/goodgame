@@ -21,7 +21,7 @@ from .ttf import TTF
 from .loader import Loader
 from .math import Math
 from .opengl import GLContext
-from .bmf import BMFont
+from .bmf import BMFont, BMChar
 
 
 __version__ = '0.1.0'
