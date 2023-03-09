@@ -104,7 +104,13 @@ class Renderer:
         #  check out of bounds (check if this handled automatic by sdl)
         #  SDL_RenderReadPixels, SDL_RenderGeometry, SDL_RenderGeometryRaw
         #  Fix Scaling for SDL2_gfx
-        #  copy_attributes function
+
+    @staticmethod
+    def copy_attributes(src_texture: Texture, dst_texture: Texture) -> None:
+        dst_texture.set_scale_mode(src_texture.scale_mode)
+        dst_texture.set_blend_mode_int(src_texture.blend_mode)
+        dst_texture.set_alpha_mod(src_texture.alpha_mod)
+        dst_texture.set_color_mod(src_texture.color_mod)
 
     def crop_texture(self, texture: Texture, crop_rect: any) -> Texture:
         bak_target = self.target
@@ -112,6 +118,7 @@ class Renderer:
             (crop_rect[2], crop_rect[3]),
             texture.get_format()
         )
+        self.copy_attributes(texture, result)
         self.set_target(result)
         self.blit(texture, src_rect=crop_rect)
         self.set_target(bak_target)
@@ -123,6 +130,7 @@ class Renderer:
             size,
             texture.get_format()
         )
+        self.copy_attributes(texture, result)
         self.set_target(result)
         self.blit(texture)
         self.set_target(bak_target)

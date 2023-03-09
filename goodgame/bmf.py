@@ -15,6 +15,7 @@ class BMChar:
         self.channel = data['chnl']
         self.letter = data['letter']
         if not self.size[0] or not self.size[1]:
+            self.texture = None
             return
         self.texture = renderer.crop_texture(page, (
             self.pos[0],
@@ -23,7 +24,6 @@ class BMChar:
             self.size[1]
         ))
         self.texture.set_blend_mode('blend')
-        self.texture.set_scale_mode('linear')
         self.destroyed = False
 
     def __add__(self, other: any) -> int:
@@ -66,7 +66,7 @@ class BMFont:
         self.destroyed = False
         # TODO: finish
 
-    def render_word(self, word: str) -> Texture:
+    def render(self, word: str) -> Texture:
         cur_x = 0
         chars = [self.chars.get(char_str) or self.chars['?'] for char_str in word]
         tex: Texture = self.renderer.create_texture(
@@ -76,7 +76,7 @@ class BMFont:
         tex.set_blend_mode('blend')
         self.renderer.set_target(tex)
         for char in chars:
-            self.renderer.blit(char.texture, dst_rect=(cur_x + char.offset[0], char.offset[1]))
+            char.texture and self.renderer.blit(char.texture, dst_rect=(cur_x + char.offset[0], char.offset[1]))
             cur_x += char.x_adv
         self.renderer.set_target(None)
         return tex
@@ -92,8 +92,11 @@ class BMFont:
             elif data[0] == 'chars':
                 self.num_chars = data[1]['count']
             elif data[0] == 'char':
-                # self.chars[chr(data[1]['id'])] =\
-                self.chars[data[1]['letter']] = BMChar(self.renderer, data[1], self.pages[data[1]['page']])
+                bm_char = BMChar(self.renderer, data[1], self.pages[data[1]['page']])
+                if data[1]['letter'] == 'space':
+                    self.chars[' '] = bm_char
+                else:
+                    self.chars[bm_char.letter] = bm_char
             elif data[0] == 'kernings':
                 self.num_kernings = data[1]['count']
 
