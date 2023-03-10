@@ -129,7 +129,6 @@ class Renderer(gg.Renderer):
         self.rotate_animation.tick(dt)
         self.circle_animation.tick(dt)
         self.set_scale((self.scale_animation.value, self.scale_animation.value))
-        # self.fps_font.set_scale((self.scale_animation.value, self.scale_animation.value))
         self.blit(self.bg)
         self.blit_ex(
             self.test_tex,
@@ -140,7 +139,7 @@ class Renderer(gg.Renderer):
         if self.draw_rects:
             self.draw_rect((0, 255, 0), (100, 100, 100, 100))
             self.draw_rect((255, 0, 0), (100.5, 100.5, 100, 100), 20)
-        self.blit(self.bm_font.render('Hello, Bruh!'.upper()), dst_rect=(200, 200))
+        self.blit(self.bm_font.render(f'FPS: {self.app.clock.get_fps()}'), dst_rect=(200, 200))
         # self.draw_rect((255, 0, 0), (200, 200, *self.bm_font.render('Hello, Bruh!'.upper()).get_size())
         self.set_scale((1, 1))
         if self.circle_animation.enabled:
