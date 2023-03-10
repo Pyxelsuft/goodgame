@@ -148,7 +148,8 @@ class Texture:
     def destroy(self) -> bool:
         if self.destroyed:
             return True
-        SDL_DestroyTexture(self.texture)
+        if self.app.init_flags['has_sdl']:
+            SDL_DestroyTexture(self.texture)
         self.destroyed = True
         del self.app
         return False

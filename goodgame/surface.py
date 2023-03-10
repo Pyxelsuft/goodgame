@@ -138,7 +138,8 @@ class Surface:
     def destroy(self) -> bool:
         if self.destroyed:
             return True
-        SDL_FreeSurface(self.surface)
+        if self.app.init_flags['has_sdl']:
+            SDL_FreeSurface(self.surface)
         self.destroyed = True
         del self.app
         return False
