@@ -76,6 +76,7 @@ class BMFont:
         )
         tex.set_blend_mode('blend')
         self.renderer.set_target(tex)
+        self.renderer.clear((0, 0, 0, 0))
         for char in chars:
             char.texture and self.renderer.blit(char.texture, dst_rect=(cur_x + char.offset[0], char.offset[1]))
             cur_x += char.x_adv
