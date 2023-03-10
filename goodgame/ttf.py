@@ -452,7 +452,8 @@ class TTF:
         if self.destroyed:
             return True
         try:
-            TTF_CloseFont(self.font)
+            if self.app.init_flags['has_ttf']:
+                TTF_CloseFont(self.font)
         except OSError:
             print(f'Failed to close font {self}')
         del self.app

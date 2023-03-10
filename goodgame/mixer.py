@@ -117,7 +117,8 @@ class Chunk:
     def destroy(self) -> bool:
         if self.destroyed:
             return True
-        Mix_FreeChunk(self.chunk)
+        if self.app.init_flags['has_mixer']:
+            Mix_FreeChunk(self.chunk)
         del self.app
         self.destroyed = True
         return False
@@ -238,7 +239,8 @@ class Music:
     def destroy(self) -> bool:
         if self.destroyed:
             return True
-        Mix_FreeMusic(self.music)
+        if self.app.init_flags['has_mixer']:
+            Mix_FreeMusic(self.music)
         del self.app
         self.destroyed = True
         return False
