@@ -542,6 +542,7 @@ class App:
         if self.destroyed:
             return True
         self.destroyed = False
+        self.event_map.clear()
         if self.init_flags['has_ttf']:
             self.init_flags['has_ttf'] = False
             TTF_Quit()

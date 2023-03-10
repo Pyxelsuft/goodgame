@@ -283,6 +283,7 @@ class Window:
     def destroy(self) -> bool:
         if self.destroyed:
             return True
+        self.event_map.clear()
         self.destroyed = True
         SDL_DestroyWindow(self.window)
         del self.app.windows[self.id]
