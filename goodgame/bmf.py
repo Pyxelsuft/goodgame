@@ -67,9 +67,9 @@ class BMFont:
         # TODO:
         #  render lines (including split by width, wrap align, etc)
 
-    def render(self, word: str) -> Texture:
+    def render(self, line: str) -> Texture:
         cur_x = 0
-        chars = [self.chars.get(char_str) or self.chars['?'] for char_str in word]
+        chars = [self.chars.get(char_str) or self.chars['?'] for char_str in line]
         tex: Texture = self.renderer.create_texture(
             (sum(chars) + chars[-1].size[0] - chars[-1].x_adv, self.common['lineHeight']),
             self.format
@@ -96,6 +96,9 @@ class BMFont:
                 bm_char = BMChar(self.renderer, data[1], self.pages[data[1]['page']])
                 if bm_char.letter == 'space':
                     self.chars[' '] = bm_char
+                    if not self.chars.get('\n'):
+                        data[1]['letter'] = '\n'
+                        self.chars['\n'] = BMChar(self.renderer, data[1], self.pages[data[1]['page']])
                 else:
                     self.chars[bm_char.letter] = bm_char
             elif data[0] == 'kernings':

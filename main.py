@@ -140,9 +140,7 @@ class Renderer(gg.Renderer):
         if self.draw_rects:
             self.draw_rect((0, 255, 0), (100, 100, 100, 100))
             self.draw_rect((255, 0, 0), (100.5, 100.5, 100, 100), 20)
-        tex = self.bm_font.render('Hello Bruh!'.upper())
-        tex.set_scale_mode('linear')
-        self.blit(tex, dst_rect=(200, 200))
+        self.blit(self.bm_font.render('Hello Bruh!'.upper()), dst_rect=(200, 200))
         # char = 'R'
         # self.bm_font.chars[char].texture.set_blend_mode('none')
         # self.blit(self.bm_font.chars[char].texture, dst_rect=(200, 200))
