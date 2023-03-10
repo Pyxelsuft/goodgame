@@ -140,11 +140,8 @@ class Renderer(gg.Renderer):
         if self.draw_rects:
             self.draw_rect((0, 255, 0), (100, 100, 100, 100))
             self.draw_rect((255, 0, 0), (100.5, 100.5, 100, 100), 20)
-        self.blit(self.bm_font.render('Hello Bruh!'.upper()), dst_rect=(200, 200))
-        # char = 'R'
-        # self.bm_font.chars[char].texture.set_blend_mode('none')
-        # self.blit(self.bm_font.chars[char].texture, dst_rect=(200, 200))
-        # self.draw_rect((255, 0, 0), (200, 200, *self.bm_font.chars['j'].texture.get_size()))
+        self.blit(self.bm_font.render('Hello, Bruh!'.upper()), dst_rect=(200, 200))
+        # self.draw_rect((255, 0, 0), (200, 200, *self.bm_font.render('Hello, Bruh!'.upper()).get_size())
         self.set_scale((1, 1))
         if self.circle_animation.enabled:
             self.draw_circle(
