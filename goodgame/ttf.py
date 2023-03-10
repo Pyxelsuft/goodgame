@@ -57,7 +57,7 @@ class TTF:
         self.face_style = app.bts(TTF_FontFaceStyleName(self.font))
         try:
             self.sdf = bool(TTF_GetFontSDF(self.font))
-        except NameError:
+        except (NameError, RuntimeError):
             self.sdf = False
         self.hinting = self.r_hint_map[TTF_GetFontHinting(self.font)]
         self.height = 0
