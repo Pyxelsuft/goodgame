@@ -24,4 +24,4 @@ from .opengl import GLContext
 from .bmf import BMFont, BMChar
 
 
-__version__ = '0.1.0'
+__version__ = '0.1.1'
