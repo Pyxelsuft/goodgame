@@ -10,8 +10,8 @@ default_window_id = [1]
 
 
 class CommonEvent:
-    def __init__(self, event: SDL_Event) -> None:
-        self.event = event
+    def __init__(self, event: any) -> None:
+        self.sdl_event = event
         self.timestamp = event.timestamp
         self.type = event.type
 
@@ -21,7 +21,7 @@ class QuitEvent(CommonEvent):
 
 
 class JoyAxisEvent(CommonEvent):
-    def __init__(self, event: SDL_Event) -> None:
+    def __init__(self, event: any) -> None:
         super().__init__(event)
         self.instance_id = event.which
         self.axis = event.axis
@@ -29,7 +29,7 @@ class JoyAxisEvent(CommonEvent):
 
 
 class JoyBallEvent(CommonEvent):
-    def __init__(self, event: SDL_Event) -> None:
+    def __init__(self, event: any) -> None:
         super().__init__(event)
         self.instance_id = event.which
         self.ball = event.ball
@@ -37,7 +37,7 @@ class JoyBallEvent(CommonEvent):
 
 
 class JoyButtonEvent(CommonEvent):
-    def __init__(self, event: SDL_Event) -> None:
+    def __init__(self, event: any) -> None:
         super().__init__(event)
         self.instance_id = event.which
         self.button = event.button
@@ -45,7 +45,7 @@ class JoyButtonEvent(CommonEvent):
 
 
 class JoyBatteryEvent(CommonEvent):
-    def __init__(self, event: SDL_Event) -> None:
+    def __init__(self, event: any) -> None:
         super().__init__(event)
         self.instance_id = event.which
         self.button = event.button
@@ -61,7 +61,7 @@ class JoyBatteryEvent(CommonEvent):
 
 
 class JoyDeviceEvent(CommonEvent):
-    def __init__(self, event: SDL_Event) -> None:
+    def __init__(self, event: any) -> None:
         super().__init__(event)
         if self.type == SDL_JOYDEVICEADDED:
             self.index = event.which
@@ -72,7 +72,7 @@ class JoyDeviceEvent(CommonEvent):
 
 
 class JoyHatEvent(CommonEvent):
-    def __init__(self, event: SDL_Event) -> None:
+    def __init__(self, event: any) -> None:
         super().__init__(event)
         self.instance_id = event.which
         self.hat = event.hat
@@ -88,7 +88,7 @@ class JoyHatEvent(CommonEvent):
 
 
 class ControllerAxisEvent(CommonEvent):
-    def __init__(self, event: SDL_Event) -> None:
+    def __init__(self, event: any) -> None:
         super().__init__(event)
         self.instance_id = event.which
         self.axis = {
@@ -105,7 +105,7 @@ class ControllerAxisEvent(CommonEvent):
 
 
 class ControllerButtonEvent(CommonEvent):
-    def __init__(self, event: SDL_Event) -> None:
+    def __init__(self, event: any) -> None:
         super().__init__(event)
         self.instance_id = event.which
         self.button = {
@@ -137,7 +137,7 @@ class ControllerButtonEvent(CommonEvent):
 
 
 class ControllerDeviceEvent(CommonEvent):
-    def __init__(self, event: SDL_Event) -> None:
+    def __init__(self, event: any) -> None:
         super().__init__(event)
         if self.type == SDL_JOYDEVICEADDED:
             self.index = event.which
@@ -148,7 +148,7 @@ class ControllerDeviceEvent(CommonEvent):
 
 
 class ControllerTouchpadEvent(CommonEvent):
-    def __init__(self, event: SDL_Event) -> None:
+    def __init__(self, event: any) -> None:
         super().__init__(event)
         self.instance_id = event.which
         self.touchpad = event.touchpad
@@ -158,7 +158,7 @@ class ControllerTouchpadEvent(CommonEvent):
 
 
 class ControllerSensorEvent(CommonEvent):
-    def __init__(self, event: SDL_Event) -> None:
+    def __init__(self, event: any) -> None:
         super().__init__(event)
         self.instance_id = event.which
         self.sensor = event.sensor
@@ -168,7 +168,7 @@ class ControllerSensorEvent(CommonEvent):
 
 
 class AudioDeviceEvent(CommonEvent):
-    def __init__(self, event: SDL_Event) -> None:
+    def __init__(self, event: any) -> None:
         super().__init__(event)
         if self.type == SDL_AUDIODEVICEADDED:
             self.which = event.which
@@ -183,7 +183,7 @@ class AudioDeviceEvent(CommonEvent):
 
 
 class DropEvent(CommonEvent):
-    def __init__(self, event: SDL_Event, app: any) -> None:
+    def __init__(self, event: any, app: any) -> None:
         super().__init__(event)
         if self.type == SDL_DROPFILE or self.type == SDL_DROPTEXT:
             self.file = app.bts(event.file)
@@ -198,7 +198,7 @@ class DropEvent(CommonEvent):
 
 
 class TouchFingerEvent(CommonEvent):
-    def __init__(self, event: SDL_Event, app: any) -> None:
+    def __init__(self, event: any, app: any) -> None:
         super().__init__(event)
         if self.type == SDL_FINGERMOTION:
             self.event = 'move'
@@ -214,7 +214,7 @@ class TouchFingerEvent(CommonEvent):
 
 
 class KeyboardEvent(CommonEvent):
-    def __init__(self, event: SDL_Event, app: any) -> None:
+    def __init__(self, event: any, app: any) -> None:
         super().__init__(event)
         self.event = 'down' if self.type == SDL_KEYDOWN else 'up'
         self.state = 'pressed' if event.state == SDL_PRESSED else 'released'
@@ -231,7 +231,7 @@ class KeyboardEvent(CommonEvent):
 
 
 class MouseMotionEvent(CommonEvent):
-    def __init__(self, event: SDL_Event, app: any) -> None:
+    def __init__(self, event: any, app: any) -> None:
         super().__init__(event)
         self.which = event.which
         self.emulated = self.which == SDL_TOUCH_MOUSEID
@@ -250,7 +250,7 @@ class MouseMotionEvent(CommonEvent):
 
 
 class MouseButtonEvent(CommonEvent):
-    def __init__(self, event: SDL_Event, app: any) -> None:
+    def __init__(self, event: any, app: any) -> None:
         super().__init__(event)
         self.button_event = 'down' if event.type == SDL_MOUSEBUTTONDOWN else 'up'
         self.which = event.which
@@ -271,7 +271,7 @@ class MouseButtonEvent(CommonEvent):
 
 
 class MouseWheelEvent(CommonEvent):
-    def __init__(self, event: SDL_Event, app: any) -> None:
+    def __init__(self, event: any, app: any) -> None:
         super().__init__(event)
         self.which = event.which
         self.emulated = self.which == SDL_TOUCH_MOUSEID
@@ -284,7 +284,7 @@ class MouseWheelEvent(CommonEvent):
 
 
 class TextEditingEvent(CommonEvent):
-    def __init__(self, event: SDL_Event, app: any) -> None:
+    def __init__(self, event: any, app: any) -> None:
         super().__init__(event)
         self.text = app.bts(event.text, 'utf-8')
         self.start = event.start
@@ -294,7 +294,7 @@ class TextEditingEvent(CommonEvent):
 
 
 class TextInputEvent(CommonEvent):
-    def __init__(self, event: SDL_Event, app: any) -> None:
+    def __init__(self, event: any, app: any) -> None:
         super().__init__(event)
         self.text = app.bts(event.text, 'utf-8')
         self.window_id = event.windowID if hasattr(event, 'windowID') else default_window_id[0]
@@ -302,7 +302,7 @@ class TextInputEvent(CommonEvent):
 
 
 class DisplayEvent(CommonEvent):
-    def __init__(self, event: SDL_Event, app: any) -> None:
+    def __init__(self, event: any, app: any) -> None:
         super().__init__(event)
         self.display = Display(event.display, app)
         if event.event == SDL_DISPLAYEVENT_ORIENTATION:
@@ -317,7 +317,7 @@ class DisplayEvent(CommonEvent):
 
 
 class WindowEvent(CommonEvent):
-    def __init__(self, event: SDL_Event, app: any) -> None:
+    def __init__(self, event: any, app: any) -> None:
         super().__init__(event)
         self.data1 = event.data1
         self.data2 = event.data2
