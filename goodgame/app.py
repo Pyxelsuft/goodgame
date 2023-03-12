@@ -223,9 +223,9 @@ class App:
         return bool(self.keyboard_state_ptr[SDL_GetScancodeFromName(self.stb(key))])
 
     @staticmethod
-    def get_img_version() -> tuple:
+    def get_img_version() -> SDLVersion:
         ver = IMG_Linked_Version().contents
-        return ver.major, ver.minor, ver.patch
+        return SDLVersion(ver.major, ver.minor, ver.patch)
 
     def set_mouse_capture(self, enabled: bool) -> None:
         self.mouse_capture = enabled
@@ -355,13 +355,8 @@ class App:
             {'lang': self.bts(_x.language), 'country': self.bts(_x.country)} for _x in SDL_GetPreferredLocales()
         )
 
-    def get_sdl_info(self) -> dict:
-        ver_ptr = SDL_version()
-        SDL_GetVersion(ver_ptr)
-        return {
-            'version': (ver_ptr.major, ver_ptr.minor, ver_ptr.patch),
-            'revision': self.bts(SDL_GetRevision())
-        }
+    def get_sdl_revision(self) -> str:
+        return self.bts(SDL_GetRevision())
 
     @staticmethod
     def get_cpu_info() -> dict:
@@ -579,7 +574,7 @@ class App:
     def get_sdl_version() -> SDLVersion:
         ver = SDL_version()
         SDL_GetVersion(ver)
-        return SDLVersion(ver)
+        return SDLVersion(ver.major, ver.minor, ver.patch)
 
     @staticmethod
     def print_sub_content(obj_for_displaying: any) -> None:

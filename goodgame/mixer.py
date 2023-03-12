@@ -1,5 +1,6 @@
 import array
 import ctypes
+from .sdl import SDLVersion
 from sdl2 import *
 
 try:
@@ -339,9 +340,9 @@ class Mixer:
         Mix_SetTimidityCfg(self.app.stb(path))
 
     @staticmethod
-    def get_version() -> tuple:
+    def get_version() -> SDLVersion:
         ver = Mix_Linked_Version().contents
-        return ver.major, ver.minor, ver.patch
+        return SDLVersion(ver.major, ver.minor, ver.patch)
 
     def destroy(self) -> bool:
         if self.destroyed:

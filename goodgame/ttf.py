@@ -1,6 +1,7 @@
 import ctypes
 import struct
 from .surface import Surface
+from .sdl import SDLVersion
 from sdl2 import *
 
 try:
@@ -432,21 +433,21 @@ class TTF:
         self.strike_through = bool(styles & TTF_STYLE_STRIKETHROUGH)
 
     @staticmethod
-    def get_version() -> tuple:
+    def get_version() -> SDLVersion:
         ver = TTF_Linked_Version().contents
-        return ver.major, ver.minor, ver.patch
+        return SDLVersion(ver.major, ver.minor, ver.patch)
 
     @staticmethod
-    def get_freetype_version() -> tuple:
+    def get_freetype_version() -> SDLVersion:
         major_ptr, minor_ptr, patch_ptr = ctypes.c_int(), ctypes.c_int(), ctypes.c_int()
         TTF_GetFreeTypeVersion(major_ptr, minor_ptr, patch_ptr)
-        return major_ptr.value, minor_ptr.value, patch_ptr.value
+        return SDLVersion(major_ptr.value, minor_ptr.value, patch_ptr.value)
 
     @staticmethod
-    def get_harfbuzz_version() -> tuple:
+    def get_harfbuzz_version() -> SDLVersion:
         major_ptr, minor_ptr, patch_ptr = ctypes.c_int(), ctypes.c_int(), ctypes.c_int()
         TTF_GetHarfBuzzVersion(major_ptr, minor_ptr, patch_ptr)
-        return major_ptr.value, minor_ptr.value, patch_ptr.value
+        return SDLVersion(major_ptr.value, minor_ptr.value, patch_ptr.value)
 
     def destroy(self) -> bool:
         if self.destroyed:
