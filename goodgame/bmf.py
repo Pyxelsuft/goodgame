@@ -1,5 +1,4 @@
 from .texture import Texture
-from sdl2 import *
 
 
 class BMChar:
@@ -68,7 +67,6 @@ class BMFont:
         #  render lines (including split by width, wrap align, etc)
 
     def render(self, line: str) -> Texture:
-        cur_x = 0
         chars = [self.chars.get(char_str) or self.chars['?'] for char_str in line]
         tex: Texture = self.renderer.create_texture(
             (sum(chars) + chars[-1].size[0] - chars[-1].x_adv, self.common['lineHeight']),
@@ -77,9 +75,41 @@ class BMFont:
         tex.set_blend_mode('blend')
         self.renderer.set_target(tex)
         self.renderer.clear((0, 0, 0, 0))
+        cur_x = 0
         for char in chars:
             char.texture and self.renderer.blit(char.texture, dst_rect=(cur_x + char.offset[0], char.offset[1]))
             cur_x += char.x_adv
+        self.renderer.set_target(None)
+        return tex
+
+    def render_lines(self, lines: str, y_offset: float = 0, wrap_align: str = 'left') -> Texture:
+        num_lines = lines.count('\n') + 1
+        lines_spl = lines.split('\n')
+        chars = [[self.chars.get(char_str) or self.chars['?'] for char_str in line] for line in lines_spl]
+        widths = [sum(chars[i]) + chars[i][-1].size[0] - chars[i][-1].x_adv for i in range(num_lines)]
+        width = max(widths)
+        tex: Texture = self.renderer.create_texture(
+            (width, self.common['lineHeight'] * num_lines),
+            self.format
+        )
+        tex.set_blend_mode('blend')
+        self.renderer.set_target(tex)
+        self.renderer.clear((0, 0, 0, 0))
+        cur_y = 0
+        for i in range(num_lines):
+            if wrap_align == 'right':
+                cur_x = width - widths[i]
+            elif wrap_align == 'center':
+                cur_x = width / 2 - widths[i] / 2
+            else:
+                cur_x = 0
+            for char in chars[i]:
+                char.texture and self.renderer.blit(
+                    char.texture,
+                    dst_rect=(cur_x + char.offset[0], cur_y + char.offset[1])
+                )
+                cur_x += char.x_adv
+            cur_y += self.common['lineHeight'] + y_offset
         self.renderer.set_target(None)
         return tex
 

@@ -139,8 +139,11 @@ class Renderer(gg.Renderer):
         if self.draw_rects:
             self.draw_rect((0, 255, 0), (100, 100, 100, 100))
             self.draw_rect((255, 0, 0), (100.5, 100.5, 100, 100), 20)
-        self.blit(self.bm_font.render(f'FPS: {self.app.clock.get_fps()}'), dst_rect=(200, 200))
-        # self.draw_rect((255, 0, 0), (200, 200, *self.bm_font.render('Hello, Bruh!'.upper()).get_size())
+        bm_tex = self.bm_font.render_lines(
+            'Lol!\nLol number!', y_offset=-self.bm_font.common['base'] / 2, wrap_align='center'
+        )
+        bm_tex.set_scale_mode('linear')
+        self.blit(bm_tex, dst_rect=(200, 400))
         self.set_scale((1, 1))
         if self.circle_animation.enabled:
             self.draw_circle(
