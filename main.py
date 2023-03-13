@@ -140,10 +140,11 @@ class Renderer(gg.Renderer):
             self.draw_rect((0, 255, 0), (100, 100, 100, 100))
             self.draw_rect((255, 0, 0), (100.5, 100.5, 100, 100), 20)
         bm_tex = self.bm_font.render_lines(
-            'Lol!\nLol number!', y_offset=-self.bm_font.common['base'] / 2, wrap_align='center'
+            f'{int(self.scale_animation.value * 100) / 100}\n{int(self.rotate_animation.value)}',
+            y_offset=-self.bm_font.common['base'] / 2, wrap_align='center'
         )
         bm_tex.set_scale_mode('linear')
-        self.blit(bm_tex, dst_rect=(200, 400))
+        self.blit(bm_tex, dst_rect=(200, 200))
         self.set_scale((1, 1))
         if self.circle_animation.enabled:
             self.draw_circle(
