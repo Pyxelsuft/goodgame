@@ -6,6 +6,7 @@ from sdl2 import *
 class PixelFormat:
     def __init__(self, pixel_format: int, app: any) -> None:
         self.pixel_format = pixel_format
+        self.string = app.r_format_map[pixel_format]
         self.pixel_format_name = app.bts(SDL_GetPixelFormatName(self.pixel_format))
         self.pixel_type = SDL_PIXELTYPE(pixel_format)
         self.pixel_layout = SDL_PIXELLAYOUT(pixel_format)

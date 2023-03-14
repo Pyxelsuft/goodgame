@@ -72,7 +72,6 @@ class BMFont:
             (sum(chars) + chars[-1].size[0] - chars[-1].x_adv, self.common['lineHeight']),
             self.format
         )
-        tex.set_blend_mode('blend')
         self.renderer.set_target(tex)
         self.renderer.clear((0, 0, 0, 0))
         cur_x = 0
@@ -92,7 +91,6 @@ class BMFont:
             (width, self.common['lineHeight'] * num_lines),
             self.format
         )
-        tex.set_blend_mode('blend')
         self.renderer.set_target(tex)
         self.renderer.clear((0, 0, 0, 0))
         cur_y = 0

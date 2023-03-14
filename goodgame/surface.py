@@ -22,13 +22,14 @@ class Surface:
         self.app = app
         self.surface = surf
         self.format = PixelFormat(surf.contents.format.contents.format, app)
+        if 'a' in self.format.string:
+            self.set_blend_mode_int(SDL_BLENDMODE_BLEND)
         self.w, self.h = surf.contents.w, surf.contents.h
         self.size = self.w, self.h
         self.clip_rect = (
             surf.contents.clip_rect.x, surf.contents.clip_rect.y,
             surf.contents.clip_rect.w, surf.contents.clip_rect.h
         )
-        self.destroyed = False
         self.color_mod = self.get_color_mod()
         self.color_key = self.get_color_key()
         self.alpha_mod = self.get_alpha_mod()
@@ -42,6 +43,7 @@ class Surface:
         except NameError:
             self.has_rle = False
         self.must_lock = self.has_rle
+        self.destroyed = False
 
     def update_blend_mode_by_alpha(self) -> None:
         SDL_SetSurfaceBlendMode(self.surface, SDL_BLENDMODE_NONE if self.alpha_mod >= 255 else SDL_BLENDMODE_NONE)

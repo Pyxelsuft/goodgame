@@ -14,6 +14,8 @@ class Texture:
         self.color_mod = self.get_color_mod()
         self.alpha_mod = self.get_alpha_mod()
         self.blend_mode = self.get_blend_mode_int()
+        if 'a' in self.get_format().string:
+            self.set_blend_mode_int(SDL_BLENDMODE_BLEND)
         self.destroyed = False
 
     def get_scale_mode(self) -> str:

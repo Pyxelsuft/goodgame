@@ -31,50 +31,6 @@ class Renderer:
         self.backend = backend or BackendManager(self.app).get_best()
         self.vsync = vsync
         self.texture = None
-        self.format_map = {
-            'unknown': SDL_PIXELFORMAT_UNKNOWN,
-            'index1lsb': SDL_PIXELFORMAT_INDEX1LSB,
-            'index1msb': SDL_PIXELFORMAT_INDEX1MSB,
-            'index4lsb': SDL_PIXELFORMAT_INDEX4LSB,
-            'index4msb': SDL_PIXELFORMAT_INDEX4MSB,
-            'index8': SDL_PIXELFORMAT_INDEX8,
-            'rgb332': SDL_PIXELFORMAT_RGB332,
-            'rgb444': SDL_PIXELFORMAT_RGB444,
-            'rgb555': SDL_PIXELFORMAT_RGB555,
-            'bgr555': SDL_PIXELFORMAT_BGR555,
-            'argb4444': SDL_PIXELFORMAT_ARGB4444,
-            'rgba4444': SDL_PIXELFORMAT_RGBA4444,
-            'abgr4444': SDL_PIXELFORMAT_ABGR4444,
-            'bgra4444': SDL_PIXELFORMAT_BGRA4444,
-            'argb1555': SDL_PIXELFORMAT_ARGB1555,
-            'rgba5551': SDL_PIXELFORMAT_RGBA5551,
-            'abgr1555': SDL_PIXELFORMAT_ABGR1555,
-            'bgra5551': SDL_PIXELFORMAT_BGRA5551,
-            'rgb565': SDL_PIXELFORMAT_RGB565,
-            'bgr565': SDL_PIXELFORMAT_BGR565,
-            'rgb24': SDL_PIXELFORMAT_RGB24,
-            'bgr24': SDL_PIXELFORMAT_BGR24,
-            'rgb888': SDL_PIXELFORMAT_RGB888,
-            'rgbx8888': SDL_PIXELFORMAT_RGBX8888,
-            'bgr888': SDL_PIXELFORMAT_BGR888,
-            'bgrx8888': SDL_PIXELFORMAT_BGRX8888,
-            'argb8888': SDL_PIXELFORMAT_ARGB8888,
-            'rgba8888': SDL_PIXELFORMAT_RGBA8888,
-            'abgr8888': SDL_PIXELFORMAT_ABGR8888,
-            'bgra8888': SDL_PIXELFORMAT_BGRA8888,
-            'argb2101010': SDL_PIXELFORMAT_ARGB2101010,
-            'rgba32': SDL_PIXELFORMAT_RGBA32,
-            'argb32': SDL_PIXELFORMAT_ARGB32,
-            'bgra32': SDL_PIXELFORMAT_BGRA32,
-            'abgr32': SDL_PIXELFORMAT_ABGR32,
-            'yv12': SDL_PIXELFORMAT_YV12,
-            'iyuv': SDL_PIXELFORMAT_IYUV,
-            'yuy2': SDL_PIXELFORMAT_YUY2,
-            'uyvy': SDL_PIXELFORMAT_UYVY,
-            'yvyu': SDL_PIXELFORMAT_YVYU,
-            'nv12': SDL_PIXELFORMAT_NV12,
-            'nv21': SDL_PIXELFORMAT_NV21
-        }
         self.access_map = {
             'static': SDL_TEXTUREACCESS_STATIC,
             'target': SDL_TEXTUREACCESS_TARGET,
@@ -140,7 +96,7 @@ class Renderer:
         return self.scale_texture_size(texture, (scale[0] * texture.get_w(), scale[1] * texture.get_h()))
 
     def pixel_format_from_str(self, format_str: str) -> PixelFormat:
-        return PixelFormat(self.format_map[format_str], self.app)
+        return PixelFormat(self.app.format_map[format_str], self.app)
 
     def window_to_logical(self, pos: any) -> tuple:
         w_ptr, h_ptr = ctypes.c_float(), ctypes.c_float()
