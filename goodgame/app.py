@@ -582,7 +582,8 @@ class App:
         if self.destroyed:
             return True
         self.destroyed = False
-        self.event_map.clear()
+        for event in self.event_map:
+            self.event_map[event] = lambda: self.on_event_after_destroy()
         if self.init_flags['has_ttf']:
             self.init_flags['has_ttf'] = False
             TTF_Quit()
@@ -630,6 +631,9 @@ class App:
             if not hasattr(elem, '__str__'):
                 continue
             print(f'{elem_name}: {elem}')
+
+    def on_event_after_destroy(self) -> None:
+        pass
 
     def on_tick(self) -> None:
         pass
