@@ -64,9 +64,9 @@ class Renderer:
     @staticmethod
     def copy_attributes(src_texture: Texture, dst_texture: Texture) -> None:
         dst_texture.set_scale_mode(src_texture.scale_mode)
-        dst_texture.set_blend_mode_int(src_texture.blend_mode)
         dst_texture.set_alpha_mod(src_texture.alpha_mod)
         dst_texture.set_color_mod(src_texture.color_mod)
+        dst_texture.set_blend_mode_int(src_texture.blend_mode)
 
     def crop_texture(self, texture: Texture, crop_rect: any) -> Texture:
         bak_target = self.target

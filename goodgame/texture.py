@@ -54,7 +54,7 @@ class Texture:
         SDL_SetTextureBlendMode(self.texture, SDL_BLENDMODE_NONE if self.alpha_mod >= 255 else SDL_BLENDMODE_NONE)
 
     def get_blend_mode(self) -> str:
-        return self.app.r_blend_map[self.blend_mode]
+        return self.app.r_blend_map[self.get_blend_mode_int()]
 
     def set_blend_mode(self, blend_mode: str) -> None:
         self.set_blend_mode_int(self.app.blend_map[blend_mode])
