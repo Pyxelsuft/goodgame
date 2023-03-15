@@ -283,12 +283,16 @@ class Window:
     def destroy(self) -> bool:
         if self.destroyed:
             return True
-        self.event_map.clear()
+        for event in self.event_map:
+            self.event_map[event] = lambda: self.on_event_after_destroy()
         self.destroyed = True
         SDL_DestroyWindow(self.window)
         del self.app.windows[self.id]
         del self.app
         return False
+
+    def on_event_after_destroy(self) -> None:
+        pass
 
     def on_drop_file(self, event: DropEvent) -> None:
         pass
