@@ -22,6 +22,12 @@ class Surface:
         self.app = app
         self.surface = surf
         self.format = PixelFormat(surf.contents.format.contents.format, app)
+        self.mask = (
+            surf.contents.format.contents.Rmask,
+            surf.contents.format.contents.Gmask,
+            surf.contents.format.contents.Bmask,
+            surf.contents.format.contents.Amask
+        )
         if 'a' in self.format.string:
             self.set_blend_mode_int(SDL_BLENDMODE_BLEND)
         self.w, self.h = surf.contents.w, surf.contents.h
@@ -30,6 +36,8 @@ class Surface:
             surf.contents.clip_rect.x, surf.contents.clip_rect.y,
             surf.contents.clip_rect.w, surf.contents.clip_rect.h
         )
+        self.bits_per_pixel = surf.contents.format.contents.BitsPerPixel
+        self.bytes_per_pixel = surf.contents.format.contents.BytesPerPixel
         self.color_mod = self.get_color_mod()
         self.color_key = self.get_color_key()
         self.alpha_mod = self.get_alpha_mod()

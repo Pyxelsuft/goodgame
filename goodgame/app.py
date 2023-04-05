@@ -239,18 +239,18 @@ class App:
         #  pixels (palettes, etc)
         #  Custom message box
 
-    def crop_surface(self, surf: Surface, crop_rect: any, mask: any = (0, 0, 0, 0)) -> Surface:
-        result = self.create_rgb_surface((crop_rect[2], crop_rect[3]), surf.format.bits_per_pixel, mask)
+    def crop_surface(self, surf: Surface, crop_rect: any) -> Surface:
+        result = self.create_rgb_surface((crop_rect[2], crop_rect[3]), surf.format.bits_per_pixel, surf.mask)
         surf.blit_to(result, src_rect=crop_rect)
         return result
 
-    def scale_surface_size(self, surf: Surface, size: any, mask: any = (0, 0, 0, 0)) -> Surface:
-        result = self.create_rgb_surface(size, surf.format.bits_per_pixel, mask)
+    def scale_surface_size(self, surf: Surface, size: any) -> Surface:
+        result = self.create_rgb_surface(size, surf.format.bits_per_pixel, surf.mask)
         surf.blit_scaled_to(result)
         return result
 
-    def scale_surface(self, surf: Surface, scale: any, mask: any = (0, 0, 0, 0)) -> Surface:
-        return self.scale_surface_size(surf, (surf.w * scale[0], surf.h * scale[1]), mask)
+    def scale_surface(self, surf: Surface, scale: any) -> Surface:
+        return self.scale_surface_size(surf, (surf.w * scale[0], surf.h * scale[1]))
 
     def get_sensors(self) -> tuple:
         return tuple(Sensor(self, _x) for _x in range(SDL_NumSensors()))
